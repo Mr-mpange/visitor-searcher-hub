@@ -3,6 +3,9 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Star, MapPin, Heart, ArrowRight, Bed, Users, Wifi } from "lucide-react";
 import { cn } from "@/lib/utils";
+import safariTentImg from "@/assets/accommodation-safari-tent.jpg";
+import beachResortImg from "@/assets/accommodation-beach-resort.jpg";
+import cityApartmentImg from "@/assets/accommodation-city-apartment.jpg";
 import accommodationImg from "@/assets/accommodation-1.jpg";
 
 // Mock data for featured listings
@@ -16,7 +19,7 @@ const featuredListings = [
     currency: "USD",
     rating: 4.9,
     reviews: 127,
-    image: accommodationImg,
+    image: safariTentImg,
     amenities: ["WiFi", "Pool", "Breakfast"],
     beds: 2,
     guests: 4,
@@ -46,7 +49,7 @@ const featuredListings = [
     currency: "USD",
     rating: 4.95,
     reviews: 203,
-    image: accommodationImg,
+    image: beachResortImg,
     amenities: ["WiFi", "Spa", "Restaurant"],
     beds: 2,
     guests: 4,
@@ -61,7 +64,7 @@ const featuredListings = [
     currency: "USD",
     rating: 4.85,
     reviews: 156,
-    image: accommodationImg,
+    image: cityApartmentImg,
     amenities: ["WiFi", "Pool", "Ocean View"],
     beds: 3,
     guests: 6,
