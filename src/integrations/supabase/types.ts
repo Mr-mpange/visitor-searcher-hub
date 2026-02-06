@@ -14,16 +14,392 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      accommodations: {
+        Row: {
+          amenities: string[] | null
+          available: boolean | null
+          beds: number | null
+          city: string
+          created_at: string
+          description: string | null
+          id: string
+          images: string[] | null
+          location: string
+          max_guests: number | null
+          price_per_night: number
+          provider_id: string
+          rating: number | null
+          reviews_count: number | null
+          status: Database["public"]["Enums"]["listing_status"] | null
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          amenities?: string[] | null
+          available?: boolean | null
+          beds?: number | null
+          city: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          location: string
+          max_guests?: number | null
+          price_per_night: number
+          provider_id: string
+          rating?: number | null
+          reviews_count?: number | null
+          status?: Database["public"]["Enums"]["listing_status"] | null
+          title: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          amenities?: string[] | null
+          available?: boolean | null
+          beds?: number | null
+          city?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          location?: string
+          max_guests?: number | null
+          price_per_night?: number
+          provider_id?: string
+          rating?: number | null
+          reviews_count?: number | null
+          status?: Database["public"]["Enums"]["listing_status"] | null
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accommodations_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bookings: {
+        Row: {
+          check_in: string | null
+          check_out: string | null
+          created_at: string
+          end_date: string | null
+          guests: number | null
+          id: string
+          notes: string | null
+          provider_id: string
+          service_id: string
+          service_type: Database["public"]["Enums"]["service_type"]
+          start_date: string | null
+          status: Database["public"]["Enums"]["booking_status"] | null
+          total_amount: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          check_in?: string | null
+          check_out?: string | null
+          created_at?: string
+          end_date?: string | null
+          guests?: number | null
+          id?: string
+          notes?: string | null
+          provider_id: string
+          service_id: string
+          service_type: Database["public"]["Enums"]["service_type"]
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["booking_status"] | null
+          total_amount: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          check_in?: string | null
+          check_out?: string | null
+          created_at?: string
+          end_date?: string | null
+          guests?: number | null
+          id?: string
+          notes?: string | null
+          provider_id?: string
+          service_id?: string
+          service_type?: Database["public"]["Enums"]["service_type"]
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["booking_status"] | null
+          total_amount?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_halls: {
+        Row: {
+          amenities: string[] | null
+          available: boolean | null
+          capacity: number | null
+          city: string
+          created_at: string
+          description: string | null
+          id: string
+          images: string[] | null
+          location: string
+          price_per_day: number | null
+          price_per_hour: number
+          provider_id: string
+          rating: number | null
+          reviews_count: number | null
+          status: Database["public"]["Enums"]["listing_status"] | null
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          amenities?: string[] | null
+          available?: boolean | null
+          capacity?: number | null
+          city: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          location: string
+          price_per_day?: number | null
+          price_per_hour: number
+          provider_id: string
+          rating?: number | null
+          reviews_count?: number | null
+          status?: Database["public"]["Enums"]["listing_status"] | null
+          title: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          amenities?: string[] | null
+          available?: boolean | null
+          capacity?: number | null
+          city?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          location?: string
+          price_per_day?: number | null
+          price_per_hour?: number
+          provider_id?: string
+          rating?: number | null
+          reviews_count?: number | null
+          status?: Database["public"]["Enums"]["listing_status"] | null
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_halls_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      providers: {
+        Row: {
+          business_address: string | null
+          business_description: string | null
+          business_email: string | null
+          business_name: string
+          business_phone: string | null
+          created_at: string
+          id: string
+          logo_url: string | null
+          updated_at: string
+          user_id: string
+          verified: boolean | null
+        }
+        Insert: {
+          business_address?: string | null
+          business_description?: string | null
+          business_email?: string | null
+          business_name: string
+          business_phone?: string | null
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          updated_at?: string
+          user_id: string
+          verified?: boolean | null
+        }
+        Update: {
+          business_address?: string | null
+          business_description?: string | null
+          business_email?: string | null
+          business_name?: string
+          business_phone?: string | null
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          updated_at?: string
+          user_id?: string
+          verified?: boolean | null
+        }
+        Relationships: []
+      }
+      rides: {
+        Row: {
+          available: boolean | null
+          city: string
+          created_at: string
+          description: string | null
+          features: string[] | null
+          id: string
+          images: string[] | null
+          location: string
+          price_per_day: number
+          price_per_km: number | null
+          provider_id: string
+          rating: number | null
+          reviews_count: number | null
+          seats: number | null
+          status: Database["public"]["Enums"]["listing_status"] | null
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          available?: boolean | null
+          city: string
+          created_at?: string
+          description?: string | null
+          features?: string[] | null
+          id?: string
+          images?: string[] | null
+          location: string
+          price_per_day: number
+          price_per_km?: number | null
+          provider_id: string
+          rating?: number | null
+          reviews_count?: number | null
+          seats?: number | null
+          status?: Database["public"]["Enums"]["listing_status"] | null
+          title: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          available?: boolean | null
+          city?: string
+          created_at?: string
+          description?: string | null
+          features?: string[] | null
+          id?: string
+          images?: string[] | null
+          location?: string
+          price_per_day?: number
+          price_per_km?: number | null
+          provider_id?: string
+          rating?: number | null
+          reviews_count?: number | null
+          seats?: number | null
+          status?: Database["public"]["Enums"]["listing_status"] | null
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rides_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "provider" | "user"
+      booking_status: "pending" | "confirmed" | "cancelled" | "completed"
+      listing_status: "draft" | "pending_approval" | "approved" | "rejected"
+      service_type: "accommodation" | "ride" | "event_hall"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +526,11 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "provider", "user"],
+      booking_status: ["pending", "confirmed", "cancelled", "completed"],
+      listing_status: ["draft", "pending_approval", "approved", "rejected"],
+      service_type: ["accommodation", "ride", "event_hall"],
+    },
   },
 } as const
