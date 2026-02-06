@@ -9,6 +9,9 @@ import {
   ChevronDown, Grid, List 
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import safariTentImg from "@/assets/accommodation-safari-tent.jpg";
+import beachResortImg from "@/assets/accommodation-beach-resort.jpg";
+import cityApartmentImg from "@/assets/accommodation-city-apartment.jpg";
 import accommodationImg from "@/assets/accommodation-1.jpg";
 
 // Mock data
@@ -21,7 +24,7 @@ const accommodations = [
     price: 250,
     rating: 4.9,
     reviews: 127,
-    image: accommodationImg,
+    image: safariTentImg,
     beds: 2,
     guests: 4,
     amenities: ["WiFi", "Pool", "Breakfast", "Spa"],
@@ -35,7 +38,7 @@ const accommodations = [
     price: 180,
     rating: 4.8,
     reviews: 94,
-    image: accommodationImg,
+    image: safariTentImg,
     beds: 1,
     guests: 2,
     amenities: ["WiFi", "Game Drives", "Meals"],
@@ -63,7 +66,7 @@ const accommodations = [
     price: 450,
     rating: 4.85,
     reviews: 156,
-    image: accommodationImg,
+    image: beachResortImg,
     beds: 3,
     guests: 6,
     amenities: ["WiFi", "Pool", "Ocean View", "Kitchen"],
@@ -77,7 +80,7 @@ const accommodations = [
     price: 380,
     rating: 4.7,
     reviews: 89,
-    image: accommodationImg,
+    image: beachResortImg,
     beds: 2,
     guests: 4,
     amenities: ["WiFi", "Beach", "Spa", "Restaurant"],
@@ -91,7 +94,7 @@ const accommodations = [
     price: 95,
     rating: 4.6,
     reviews: 67,
-    image: accommodationImg,
+    image: cityApartmentImg,
     beds: 1,
     guests: 2,
     amenities: ["WiFi", "Kitchen", "Parking"],

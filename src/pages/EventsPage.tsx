@@ -8,7 +8,9 @@ import {
   Mic, Wifi, Car, UtensilsCrossed, Grid, List, Calendar
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import eventHallImg from "@/assets/event-hall-1.jpg";
+import weddingHallImg from "@/assets/event-wedding-hall.jpg";
+import conferenceRoomImg from "@/assets/event-conference-room.jpg";
+import gardenVenueImg from "@/assets/event-garden-venue.jpg";
 
 // Mock data
 const eventHalls = [
@@ -21,7 +23,7 @@ const eventHalls = [
     pricePerHour: 350,
     rating: 4.9,
     reviews: 78,
-    image: eventHallImg,
+    image: weddingHallImg,
     capacity: 500,
     amenities: ["Catering", "PA System", "Parking", "WiFi"],
     available: true,
@@ -35,7 +37,7 @@ const eventHalls = [
     pricePerHour: 250,
     rating: 4.8,
     reviews: 92,
-    image: eventHallImg,
+    image: conferenceRoomImg,
     capacity: 200,
     amenities: ["Projector", "WiFi", "Catering", "Breakout Rooms"],
     available: true,
@@ -49,7 +51,7 @@ const eventHalls = [
     pricePerHour: 600,
     rating: 4.95,
     reviews: 156,
-    image: eventHallImg,
+    image: weddingHallImg,
     capacity: 300,
     amenities: ["Beach Access", "Catering", "Decor", "Bridal Suite"],
     available: false,
@@ -63,7 +65,7 @@ const eventHalls = [
     pricePerHour: 120,
     rating: 4.7,
     reviews: 64,
-    image: eventHallImg,
+    image: conferenceRoomImg,
     capacity: 25,
     amenities: ["Video Conference", "WiFi", "Coffee", "Whiteboard"],
     available: true,
@@ -77,7 +79,7 @@ const eventHalls = [
     pricePerHour: 450,
     rating: 4.85,
     reviews: 89,
-    image: eventHallImg,
+    image: gardenVenueImg,
     capacity: 400,
     amenities: ["Garden", "Tenting", "Catering", "Parking"],
     available: true,
@@ -91,7 +93,7 @@ const eventHalls = [
     pricePerHour: 700,
     rating: 4.6,
     reviews: 45,
-    image: eventHallImg,
+    image: weddingHallImg,
     capacity: 1000,
     amenities: ["Stage", "PA System", "Catering", "VIP Lounge"],
     available: true,

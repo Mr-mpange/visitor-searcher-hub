@@ -8,7 +8,9 @@ import {
   Fuel, Settings, Filter, Grid, List, Calendar, Clock
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import ridesImg from "@/assets/rides-1.jpg";
+import safariVehicleImg from "@/assets/rides-safari-vehicle.jpg";
+import airportTransferImg from "@/assets/rides-airport-transfer.jpg";
+import tourVanImg from "@/assets/rides-tour-van.jpg";
 
 // Mock data
 const rides = [
@@ -21,7 +23,7 @@ const rides = [
     pricePerKm: 2,
     rating: 4.9,
     reviews: 87,
-    image: ridesImg,
+    image: safariVehicleImg,
     seats: 8,
     features: ["4WD", "Pop-up Roof", "Cooler Box", "Guide"],
     available: true,
@@ -35,7 +37,7 @@ const rides = [
     pricePerKm: 1.5,
     rating: 4.7,
     reviews: 156,
-    image: ridesImg,
+    image: airportTransferImg,
     seats: 4,
     features: ["AC", "WiFi", "Leather Seats"],
     available: true,
@@ -49,7 +51,7 @@ const rides = [
     pricePerKm: 3,
     rating: 4.8,
     reviews: 64,
-    image: ridesImg,
+    image: tourVanImg,
     seats: 15,
     features: ["AC", "WiFi", "PA System", "TV"],
     available: true,
@@ -63,7 +65,7 @@ const rides = [
     pricePerKm: 1,
     rating: 4.6,
     reviews: 123,
-    image: ridesImg,
+    image: tourVanImg,
     seats: 3,
     features: ["Open Air", "Local Guide"],
     available: false,
@@ -77,7 +79,7 @@ const rides = [
     pricePerKm: 2.5,
     rating: 4.95,
     reviews: 201,
-    image: ridesImg,
+    image: safariVehicleImg,
     seats: 6,
     features: ["4WD", "Camera Mounts", "Binoculars", "Guide"],
     available: true,
@@ -91,7 +93,7 @@ const rides = [
     pricePerKm: 4,
     rating: 4.5,
     reviews: 42,
-    image: ridesImg,
+    image: airportTransferImg,
     seats: 45,
     features: ["AC", "WiFi", "Restroom", "Reclining Seats"],
     available: true,
