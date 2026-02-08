@@ -5,8 +5,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import AccommodationPage from "./pages/AccommodationPage";
+import AccommodationDetailPage from "./pages/AccommodationDetailPage";
 import RidesPage from "./pages/RidesPage";
+import RideDetailPage from "./pages/RideDetailPage";
 import EventsPage from "./pages/EventsPage";
+import EventDetailPage from "./pages/EventDetailPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import OwnerLoginPage from "./pages/owner/OwnerLoginPage";
@@ -14,6 +17,7 @@ import OwnerSignupPage from "./pages/owner/OwnerSignupPage";
 import OwnerDashboardPage from "./pages/owner/OwnerDashboardPage";
 import OwnerSettingsPage from "./pages/owner/OwnerSettingsPage";
 import OwnerListingsPage from "./pages/owner/OwnerListingsPage";
+import OwnerListingFormPage from "./pages/owner/OwnerListingFormPage";
 import OwnerBookingsPage from "./pages/owner/OwnerBookingsPage";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
@@ -32,8 +36,11 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/accommodation" element={<AccommodationPage />} />
+          <Route path="/accommodation/:id" element={<AccommodationDetailPage />} />
           <Route path="/rides" element={<RidesPage />} />
+          <Route path="/rides/:id" element={<RideDetailPage />} />
           <Route path="/events" element={<EventsPage />} />
+          <Route path="/events/:id" element={<EventDetailPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           
@@ -43,8 +50,14 @@ const App = () => (
           <Route path="/owner/dashboard" element={<OwnerDashboardPage />} />
           <Route path="/owner/settings" element={<OwnerSettingsPage />} />
           <Route path="/owner/accommodations" element={<OwnerListingsPage />} />
+          <Route path="/owner/accommodations/new" element={<OwnerListingFormPage />} />
+          <Route path="/owner/accommodations/:id/edit" element={<OwnerListingFormPage />} />
           <Route path="/owner/rides" element={<OwnerListingsPage />} />
+          <Route path="/owner/rides/new" element={<OwnerListingFormPage />} />
+          <Route path="/owner/rides/:id/edit" element={<OwnerListingFormPage />} />
           <Route path="/owner/events" element={<OwnerListingsPage />} />
+          <Route path="/owner/events/new" element={<OwnerListingFormPage />} />
+          <Route path="/owner/events/:id/edit" element={<OwnerListingFormPage />} />
           <Route path="/owner/bookings" element={<OwnerBookingsPage />} />
           
           {/* Admin Routes */}
