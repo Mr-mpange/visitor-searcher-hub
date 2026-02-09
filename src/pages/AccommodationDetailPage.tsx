@@ -151,13 +151,36 @@ const mockAccommodations: Record<string, any> = {
   }
 };
 
-const amenityIcons: Record<string, any> = {
-  "WiFi": Wifi,
-  "Pool": () => <span className="text-sm">🏊</span>,
-  "Kitchen": Coffee,
-  "Parking": Car,
-  "Restaurant": Utensils,
-  "Breakfast": Coffee,
+const getAmenityIcon = (amenity: string) => {
+  const icons: Record<string, React.ReactNode> = {
+    "WiFi": <Wifi className="w-5 h-5 text-primary" />,
+    "Pool": <span className="text-lg">🏊</span>,
+    "Kitchen": <Coffee className="w-5 h-5 text-primary" />,
+    "Parking": <Car className="w-5 h-5 text-primary" />,
+    "Restaurant": <Utensils className="w-5 h-5 text-primary" />,
+    "Breakfast": <Coffee className="w-5 h-5 text-primary" />,
+    "Spa": <span className="text-lg">💆</span>,
+    "Air Conditioning": <span className="text-lg">❄️</span>,
+    "Safari Tours": <span className="text-lg">🦁</span>,
+    "Game Drives": <span className="text-lg">🚙</span>,
+    "Meals Included": <Utensils className="w-5 h-5 text-primary" />,
+    "Campfire": <span className="text-lg">🔥</span>,
+    "Bush Walks": <span className="text-lg">🚶</span>,
+    "Falls View": <span className="text-lg">🌊</span>,
+    "Helicopter Tours": <span className="text-lg">🚁</span>,
+    "Gym": <span className="text-lg">🏋️</span>,
+    "Ocean View": <span className="text-lg">🌅</span>,
+    "Private Chef": <span className="text-lg">👨‍🍳</span>,
+    "Wine Cellar": <span className="text-lg">🍷</span>,
+    "Concierge": <span className="text-lg">🛎️</span>,
+    "Beach Access": <span className="text-lg">🏖️</span>,
+    "Water Sports": <span className="text-lg">🏄</span>,
+    "Diving Center": <span className="text-lg">🤿</span>,
+    "Security": <span className="text-lg">🔒</span>,
+    "Gym Access": <span className="text-lg">🏋️</span>,
+    "Room Service": <span className="text-lg">🛎️</span>,
+  };
+  return icons[amenity] || <Check className="w-5 h-5 text-primary" />;
 };
 
 const AccommodationDetailPage = () => {
@@ -254,7 +277,9 @@ const AccommodationDetailPage = () => {
             type: 'accommodation',
             serviceName: accommodation.title,
             customerPhone: phone,
+            customerEmail: user.email,
             providerPhone: accommodation.provider?.business_phone,
+            providerEmail: accommodation.provider?.business_email,
             checkIn: format(dateRange.from, 'PPP'),
             checkOut: format(dateRange.to, 'PPP'),
             guests,
@@ -292,7 +317,9 @@ const AccommodationDetailPage = () => {
           type: 'accommodation',
           serviceName: accommodation.title,
           customerPhone: phone,
+          customerEmail: user.email,
           providerPhone: accommodation.provider?.business_phone,
+          providerEmail: accommodation.provider?.business_email,
           checkIn: format(dateRange.from, 'PPP'),
           checkOut: format(dateRange.to, 'PPP'),
           guests,
@@ -465,15 +492,12 @@ const AccommodationDetailPage = () => {
               <div>
                 <h2 className="text-xl font-semibold text-foreground mb-4">What this place offers</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {accommodation.amenities?.map((amenity: string) => {
-                    const IconComponent = amenityIcons[amenity] || Check;
-                    return (
-                      <div key={amenity} className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50">
-                        {typeof IconComponent === 'function' ? <IconComponent className="w-5 h-5 text-primary" /> : IconComponent}
-                        <span className="text-foreground">{amenity}</span>
-                      </div>
-                    );
-                  })}
+                  {accommodation.amenities?.map((amenity: string) => (
+                    <div key={amenity} className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50">
+                      {getAmenityIcon(amenity)}
+                      <span className="text-foreground">{amenity}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
