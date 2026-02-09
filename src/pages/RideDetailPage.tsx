@@ -19,6 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 import { format, differenceInDays } from "date-fns";
 import type { DateRange } from "react-day-picker";
+import { ReviewsSection } from "@/components/reviews/ReviewsSection";
 
 // Static images for mock data
 import safariVehicleImg from "@/assets/rides-safari-vehicle.jpg";
@@ -452,6 +453,14 @@ const RideDetailPage = () => {
                   </CardContent>
                 </Card>
               )}
+
+              {/* Reviews Section */}
+              <ReviewsSection
+                serviceType="ride"
+                serviceId={ride.id}
+                rating={ride.rating || 0}
+                reviewsCount={ride.reviews_count || 0}
+              />
             </div>
 
             <div className="lg:col-span-1">

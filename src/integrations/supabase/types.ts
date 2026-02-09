@@ -290,6 +290,59 @@ export type Database = {
         }
         Relationships: []
       }
+      reviews: {
+        Row: {
+          booking_id: string
+          content: string | null
+          created_at: string
+          id: string
+          rating: number
+          response: string | null
+          response_at: string | null
+          service_id: string
+          service_type: Database["public"]["Enums"]["service_type"]
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          booking_id: string
+          content?: string | null
+          created_at?: string
+          id?: string
+          rating: number
+          response?: string | null
+          response_at?: string | null
+          service_id: string
+          service_type: Database["public"]["Enums"]["service_type"]
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          booking_id?: string
+          content?: string | null
+          created_at?: string
+          id?: string
+          rating?: number
+          response?: string | null
+          response_at?: string | null
+          service_id?: string
+          service_type?: Database["public"]["Enums"]["service_type"]
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rides: {
         Row: {
           available: boolean | null
