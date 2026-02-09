@@ -20,6 +20,7 @@ import {
 import { cn } from "@/lib/utils";
 import { format, differenceInDays, addDays } from "date-fns";
 import type { DateRange } from "react-day-picker";
+import { ReviewsSection } from "@/components/reviews/ReviewsSection";
 
 // Static images for mock data
 import safariTentImg from "@/assets/accommodation-safari-tent.jpg";
@@ -523,6 +524,14 @@ const AccommodationDetailPage = () => {
                   </CardContent>
                 </Card>
               )}
+
+              {/* Reviews Section */}
+              <ReviewsSection
+                serviceType="accommodation"
+                serviceId={accommodation.id}
+                rating={accommodation.rating || 0}
+                reviewsCount={accommodation.reviews_count || 0}
+              />
             </div>
 
             {/* Booking Card */}

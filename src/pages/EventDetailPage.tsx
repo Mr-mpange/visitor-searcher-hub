@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { ReviewsSection } from "@/components/reviews/ReviewsSection";
 
 // Static images
 import weddingHallImg from "@/assets/event-wedding-hall.jpg";
@@ -450,6 +451,14 @@ const EventDetailPage = () => {
                   </CardContent>
                 </Card>
               )}
+
+              {/* Reviews Section */}
+              <ReviewsSection
+                serviceType="event_hall"
+                serviceId={hall.id}
+                rating={hall.rating || 0}
+                reviewsCount={hall.reviews_count || 0}
+              />
             </div>
 
             <div className="lg:col-span-1">
