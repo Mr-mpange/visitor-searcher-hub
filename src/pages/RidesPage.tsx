@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { FavoriteButton } from "@/components/FavoriteButton";
+import { useFavorites } from "@/hooks/useFavorites";
 import { Button } from "@/components/ui/button";
 import { 
   Search, MapPin, Star, Heart, Users, Car, 
@@ -105,14 +107,8 @@ const types = ["All", "Safari Vehicle", "Airport Transfer", "Group Transport", "
 const RidesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState("All");
-  const [favorites, setFavorites] = useState<number[]>([]);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-
-  const toggleFavorite = (id: number) => {
-    setFavorites((prev) =>
-      prev.includes(id) ? prev.filter((fId) => fId !== id) : [...prev, id]
-    );
-  };
+  const { isFavorite, toggleFavorite: toggleDbFavorite } = useFavorites();
 
   const filteredRides = rides.filter((ride) => {
     const matchesSearch =
@@ -252,22 +248,13 @@ const RidesPage = () => {
                     <div className="absolute inset-0 bg-gradient-to-t from-foreground/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
                     {/* Favorite Button */}
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        toggleFavorite(ride.id);
-                      }}
-                      className="absolute top-3 right-3 w-9 h-9 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-colors"
-                    >
-                      <Heart
-                        className={cn(
-                          "w-5 h-5 transition-colors",
-                          favorites.includes(ride.id)
-                            ? "fill-accent text-accent"
-                            : "text-foreground"
-                        )}
-                      />
-                    </button>
+                    <FavoriteButton
+                      serviceId={String(ride.id)}
+                      serviceType="ride"
+                      isFavorite={isFavorite(String(ride.id))}
+                      onToggle={toggleDbFavorite}
+                      className="absolute top-3 right-3"
+                    />
 
                     {/* Type Badge */}
                     <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-card/80 backdrop-blur-sm text-xs font-medium text-foreground">
