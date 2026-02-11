@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, MapPin, User, ChevronDown } from "lucide-react";
+import { Menu, X, MapPin, User, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -58,12 +58,19 @@ export const Navbar = () => {
               <Link to="/owner/login">For Providers</Link>
             </Button>
             {user ? (
-              <Button variant="outline" size="sm" asChild>
-                <Link to="/profile">
-                  <User className="w-4 h-4" />
-                  My Profile
-                </Link>
-              </Button>
+              <>
+                <Button variant="ghost" size="icon" asChild>
+                  <Link to="/favorites">
+                    <Heart className="w-5 h-5" />
+                  </Link>
+                </Button>
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/profile">
+                    <User className="w-4 h-4" />
+                    My Profile
+                  </Link>
+                </Button>
+              </>
             ) : (
               <>
                 <Button variant="outline" size="sm" asChild>

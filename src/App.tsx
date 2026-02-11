@@ -25,6 +25,7 @@ import AdminUsersPage from "./pages/admin/AdminUsersPage";
 import AdminListingsPage from "./pages/admin/AdminListingsPage";
 import ProfilePage from "./pages/ProfilePage";
 import HowItWorksPage from "./pages/HowItWorksPage";
+import FavoritesPage from "./pages/FavoritesPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -47,6 +48,7 @@ const App = () => (
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/favorites" element={<FavoritesPage />} />
           
           {/* Provider Routes */}
           <Route path="/owner/login" element={<OwnerLoginPage />} />
