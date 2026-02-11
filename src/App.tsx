@@ -24,6 +24,7 @@ import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import AdminUsersPage from "./pages/admin/AdminUsersPage";
 import AdminListingsPage from "./pages/admin/AdminListingsPage";
 import ProfilePage from "./pages/ProfilePage";
+import HowItWorksPage from "./pages/HowItWorksPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/how-it-works" element={<HowItWorksPage />} />
           <Route path="/accommodation" element={<AccommodationPage />} />
           <Route path="/accommodation/:id" element={<AccommodationDetailPage />} />
           <Route path="/rides" element={<RidesPage />} />

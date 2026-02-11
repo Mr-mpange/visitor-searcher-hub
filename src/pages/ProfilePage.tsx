@@ -4,9 +4,11 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ProfileEditForm } from "@/components/profile/ProfileEditForm";
 import {
   User, Calendar, Star, MapPin, Clock, Bed, Car, PartyPopper,
-  LogOut, Mail, Phone, ChevronRight
+  LogOut, Mail, Phone, Heart, Pencil
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -46,6 +48,15 @@ interface Review {
   service_title?: string;
 }
 
+interface Favorite {
+  id: string;
+  service_type: ServiceType;
+  service_id: string;
+  created_at: string;
+  service_title?: string;
+  service_location?: string;
+}
+
 const serviceIcon = (type: ServiceType) => {
   switch (type) {
     case "accommodation": return <Bed className="w-4 h-4" />;
@@ -77,7 +88,9 @@ const ProfilePage = () => {
   const [profile, setProfile] = useState<{ full_name?: string; email?: string; phone?: string; avatar_url?: string } | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editOpen, setEditOpen] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -93,25 +106,17 @@ const ProfilePage = () => {
     setLoading(true);
 
     try {
-      // Fetch profile, bookings, and reviews in parallel
-      const [profileRes, bookingsRes, reviewsRes] = await Promise.all([
+      const [profileRes, bookingsRes, reviewsRes, favRes] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", user.id).single(),
         supabase.from("bookings").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
         supabase.from("reviews").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
+        supabase.from("favorites").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
       ]);
 
       if (profileRes.data) setProfile(profileRes.data);
-
-      // Enrich bookings with service titles
-      if (bookingsRes.data) {
-        const enriched = await enrichBookings(bookingsRes.data);
-        setBookings(enriched);
-      }
-
-      if (reviewsRes.data) {
-        const enrichedReviews = await enrichReviews(reviewsRes.data);
-        setReviews(enrichedReviews);
-      }
+      if (bookingsRes.data) setBookings(await enrichBookings(bookingsRes.data));
+      if (reviewsRes.data) setReviews(await enrichReviews(reviewsRes.data));
+      if (favRes.data) setFavorites(await enrichFavorites(favRes.data));
     } catch (err) {
       console.error("Error fetching profile data:", err);
     } finally {
@@ -158,9 +163,29 @@ const ProfilePage = () => {
       titleMap.set(s.id, s.title);
     });
 
-    return raw.map(r => ({
-      ...r,
-      service_title: titleMap.get(r.service_id) || "Unknown Service",
+    return raw.map(r => ({ ...r, service_title: titleMap.get(r.service_id) || "Unknown Service" }));
+  };
+
+  const enrichFavorites = async (raw: any[]): Promise<Favorite[]> => {
+    const accIds = raw.filter(f => f.service_type === "accommodation").map(f => f.service_id);
+    const rideIds = raw.filter(f => f.service_type === "ride").map(f => f.service_id);
+    const eventIds = raw.filter(f => f.service_type === "event_hall").map(f => f.service_id);
+
+    const [accRes, rideRes, eventRes] = await Promise.all([
+      accIds.length ? supabase.from("accommodations").select("id, title, location").in("id", accIds) : { data: [] },
+      rideIds.length ? supabase.from("rides").select("id, title, location").in("id", rideIds) : { data: [] },
+      eventIds.length ? supabase.from("event_halls").select("id, title, location").in("id", eventIds) : { data: [] },
+    ]);
+
+    const serviceMap = new Map<string, { title: string; location: string }>();
+    [...(accRes.data || []), ...(rideRes.data || []), ...(eventRes.data || [])].forEach(s => {
+      serviceMap.set(s.id, { title: s.title, location: s.location });
+    });
+
+    return raw.map(f => ({
+      ...f,
+      service_title: serviceMap.get(f.service_id)?.title || "Unknown Service",
+      service_location: serviceMap.get(f.service_id)?.location || "",
     }));
   };
 
@@ -195,7 +220,7 @@ const ProfilePage = () => {
           <div className="bg-card rounded-2xl p-6 shadow-md mb-8">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
                   {profile?.avatar_url ? (
                     <img src={profile.avatar_url} alt="Avatar" className="w-16 h-16 rounded-full object-cover" />
                   ) : (
@@ -220,10 +245,35 @@ const ProfilePage = () => {
                   </div>
                 </div>
               </div>
-              <Button variant="outline" size="sm" onClick={handleSignOut}>
-                <LogOut className="w-4 h-4" />
-                Sign Out
-              </Button>
+              <div className="flex items-center gap-2">
+                <Dialog open={editOpen} onOpenChange={setEditOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Pencil className="w-4 h-4" />
+                      Edit
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Edit Profile</DialogTitle>
+                    </DialogHeader>
+                    {user && profile && (
+                      <ProfileEditForm
+                        userId={user.id}
+                        profile={profile}
+                        onSaved={() => {
+                          setEditOpen(false);
+                          fetchData();
+                        }}
+                      />
+                    )}
+                  </DialogContent>
+                </Dialog>
+                <Button variant="outline" size="sm" onClick={handleSignOut}>
+                  <LogOut className="w-4 h-4" />
+                  Sign Out
+                </Button>
+              </div>
             </div>
           </div>
 
@@ -238,6 +288,10 @@ const ProfilePage = () => {
                 <Star className="w-4 h-4 mr-2" />
                 Reviews ({reviews.length})
               </TabsTrigger>
+              <TabsTrigger value="favorites" className="flex-1">
+                <Heart className="w-4 h-4 mr-2" />
+                Favorites ({favorites.length})
+              </TabsTrigger>
             </TabsList>
 
             {/* Bookings Tab */}
@@ -246,9 +300,7 @@ const ProfilePage = () => {
                 <div className="text-center py-12 bg-card rounded-2xl">
                   <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
                   <p className="text-muted-foreground">No bookings yet</p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Browse our listings and book your next adventure!
-                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">Browse our listings and book your next adventure!</p>
                 </div>
               ) : (
                 bookings.map((booking) => (
@@ -297,9 +349,7 @@ const ProfilePage = () => {
                 <div className="text-center py-12 bg-card rounded-2xl">
                   <Star className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
                   <p className="text-muted-foreground">No reviews yet</p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Complete a booking to leave a review!
-                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">Complete a booking to leave a review!</p>
                 </div>
               ) : (
                 reviews.map((review) => (
@@ -310,6 +360,42 @@ const ProfilePage = () => {
                       <span className="text-xs text-muted-foreground">• {serviceLabel(review.service_type)}</span>
                     </div>
                     <ReviewCard review={review} />
+                  </div>
+                ))
+              )}
+            </TabsContent>
+
+            {/* Favorites Tab */}
+            <TabsContent value="favorites" className="space-y-4">
+              {favorites.length === 0 ? (
+                <div className="text-center py-12 bg-card rounded-2xl">
+                  <Heart className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                  <p className="text-muted-foreground">No favorites yet</p>
+                  <p className="text-sm text-muted-foreground mt-1">Tap the heart icon on any listing to save it here!</p>
+                </div>
+              ) : (
+                favorites.map((fav) => (
+                  <div
+                    key={fav.id}
+                    className="bg-card rounded-xl p-4 shadow-sm border border-border hover:shadow-md transition-shadow cursor-pointer"
+                    onClick={() => {
+                      const path = fav.service_type === "accommodation" ? "/accommodation" : fav.service_type === "ride" ? "/rides" : "/events";
+                      navigate(`${path}/${fav.service_id}`);
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                        {serviceIcon(fav.service_type)}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-foreground text-sm">{fav.service_title}</h3>
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
+                          <MapPin className="w-3 h-3" />
+                          {fav.service_location}
+                        </div>
+                      </div>
+                      <Heart className="w-5 h-5 fill-destructive text-destructive" />
+                    </div>
                   </div>
                 ))
               )}
