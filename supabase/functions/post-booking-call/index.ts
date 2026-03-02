@@ -122,7 +122,7 @@ serve(async (req) => {
       body: new URLSearchParams({
         username: atUsername,
         to: customerPhone,
-        from: '+15551234567', // Replace with your AT phone number or remove for sandbox
+        ...(atUsername !== 'sandbox' ? { from: Deno.env.get('AT_PHONE_NUMBER') || '' } : {}),
         callbackUrl: callbackUrl,
       }),
     });
