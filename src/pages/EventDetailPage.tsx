@@ -251,6 +251,20 @@ const EventDetailPage = () => {
           }
         });
 
+        // Trigger post-booking TTS call
+        if (phone) {
+          supabase.functions.invoke('post-booking-call', {
+            body: {
+              customerPhone: phone,
+              serviceName: hall.title,
+              type: 'event_hall',
+              totalAmount,
+              eventDate: format(selectedDate, 'PPP'),
+              expectedGuests,
+            }
+          }).catch(err => console.log('Voice call skipped:', err));
+        }
+
         toast({
           title: "Booking Confirmed!",
           description: `Your event at ${hall.title} has been booked for ${format(selectedDate, 'PPP')}.`,
@@ -287,6 +301,20 @@ const EventDetailPage = () => {
           totalAmount,
         }
       });
+
+      // Trigger post-booking TTS call
+      if (phone) {
+        supabase.functions.invoke('post-booking-call', {
+          body: {
+            customerPhone: phone,
+            serviceName: hall.title,
+            type: 'event_hall',
+            totalAmount,
+            eventDate: format(selectedDate, 'PPP'),
+            expectedGuests,
+          }
+        }).catch(err => console.log('Voice call skipped:', err));
+      }
 
       toast({
         title: "Booking Confirmed!",

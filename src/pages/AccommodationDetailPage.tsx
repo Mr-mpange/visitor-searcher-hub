@@ -288,6 +288,21 @@ const AccommodationDetailPage = () => {
           }
         });
 
+        // Trigger post-booking TTS call
+        if (phone) {
+          supabase.functions.invoke('post-booking-call', {
+            body: {
+              customerPhone: phone,
+              serviceName: accommodation.title,
+              type: 'accommodation',
+              totalAmount,
+              checkIn: format(dateRange.from, 'PPP'),
+              checkOut: format(dateRange.to, 'PPP'),
+              guests,
+            }
+          }).catch(err => console.log('Voice call skipped:', err));
+        }
+
         toast({
           title: "Booking Confirmed!",
           description: `Your stay at ${accommodation.title} has been booked for ${nights} night(s).`,
@@ -327,6 +342,21 @@ const AccommodationDetailPage = () => {
           totalAmount,
         }
       });
+
+      // Trigger post-booking TTS call
+      if (phone) {
+        supabase.functions.invoke('post-booking-call', {
+          body: {
+            customerPhone: phone,
+            serviceName: accommodation.title,
+            type: 'accommodation',
+            totalAmount,
+            checkIn: format(dateRange.from, 'PPP'),
+            checkOut: format(dateRange.to, 'PPP'),
+            guests,
+          }
+        }).catch(err => console.log('Voice call skipped:', err));
+      }
 
       toast({
         title: "Booking Confirmed!",

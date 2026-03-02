@@ -1,1 +1,4 @@
 project_id = "xxkvgswqhzmqsbeiaswb"
+
+[functions.post-booking-call]
+verify_jwt = false

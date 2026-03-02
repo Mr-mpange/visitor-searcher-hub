@@ -249,6 +249,20 @@ const RideDetailPage = () => {
           }
         });
 
+        // Trigger post-booking TTS call
+        if (phone) {
+          supabase.functions.invoke('post-booking-call', {
+            body: {
+              customerPhone: phone,
+              serviceName: ride.title,
+              type: 'ride',
+              totalAmount,
+              startDate: format(dateRange.from, 'PPP'),
+              endDate: format(dateRange.to, 'PPP'),
+            }
+          }).catch(err => console.log('Voice call skipped:', err));
+        }
+
         toast({
           title: "Booking Confirmed!",
           description: `Your ${ride.title} has been booked for ${days} day(s).`,
@@ -284,6 +298,20 @@ const RideDetailPage = () => {
           totalAmount,
         }
       });
+
+      // Trigger post-booking TTS call
+      if (phone) {
+        supabase.functions.invoke('post-booking-call', {
+          body: {
+            customerPhone: phone,
+            serviceName: ride.title,
+            type: 'ride',
+            totalAmount,
+            startDate: format(dateRange.from, 'PPP'),
+            endDate: format(dateRange.to, 'PPP'),
+          }
+        }).catch(err => console.log('Voice call skipped:', err));
+      }
 
       toast({
         title: "Booking Confirmed!",
