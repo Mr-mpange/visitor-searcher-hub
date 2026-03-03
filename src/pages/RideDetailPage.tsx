@@ -233,91 +233,101 @@ const RideDetailPage = () => {
     try {
       const days = differenceInDays(dateRange.to, dateRange.from) || 1;
       const totalAmount = days * ride.price_per_day;
+      const startDateStr = format(dateRange.from, 'PPP');
+      const endDateStr = format(dateRange.to, 'PPP');
 
-      if (mockRides[id!]) {
-        await supabase.functions.invoke('send-booking-notification', {
-          body: {
-            type: 'ride',
-            serviceName: ride.title,
-            customerPhone: phone,
-            providerPhone: ride.provider?.business_phone,
-            startDate: format(dateRange.from, 'PPP'),
-            endDate: format(dateRange.to, 'PPP'),
-            pickupLocation,
-            dropoffLocation,
-            totalAmount,
-          }
-        });
+      let bookingId = '';
 
-        // Trigger post-booking TTS call
-        if (phone) {
-          supabase.functions.invoke('post-booking-call', {
-            body: {
-              customerPhone: phone,
-              serviceName: ride.title,
-              type: 'ride',
-              totalAmount,
-              startDate: format(dateRange.from, 'PPP'),
-              endDate: format(dateRange.to, 'PPP'),
-            }
-          }).catch(err => console.log('Voice call skipped:', err));
-        }
+      if (!mockRides[id!]) {
+        const { data: bookingData, error } = await supabase.from('bookings').insert({
+          user_id: user.id,
+          provider_id: ride.provider_id,
+          service_type: 'ride' as const,
+          service_id: ride.id,
+          start_date: format(dateRange.from, 'yyyy-MM-dd'),
+          end_date: format(dateRange.to, 'yyyy-MM-dd'),
+          total_amount: totalAmount,
+          notes: `Pickup: ${pickupLocation}, Dropoff: ${dropoffLocation}. ${notes}`,
+          status: 'pending'
+        }).select('id').single();
 
-        toast({
-          title: "Booking Confirmed!",
-          description: `Your ${ride.title} has been booked for ${days} day(s).`,
-        });
-        navigate('/');
-        return;
+        if (error) throw error;
+        bookingId = bookingData?.id || '';
       }
 
-      const { error } = await supabase.from('bookings').insert({
-        user_id: user.id,
-        provider_id: ride.provider_id,
-        service_type: 'ride',
-        service_id: ride.id,
-        start_date: format(dateRange.from, 'yyyy-MM-dd'),
-        end_date: format(dateRange.to, 'yyyy-MM-dd'),
-        total_amount: totalAmount,
-        notes: `Pickup: ${pickupLocation}, Dropoff: ${dropoffLocation}. ${notes}`,
-        status: 'pending'
-      });
-
-      if (error) throw error;
-
-      await supabase.functions.invoke('send-booking-notification', {
+      supabase.functions.invoke('send-booking-notification', {
         body: {
           type: 'ride',
           serviceName: ride.title,
           customerPhone: phone,
           providerPhone: ride.provider?.business_phone,
-          startDate: format(dateRange.from, 'PPP'),
-          endDate: format(dateRange.to, 'PPP'),
+          startDate: startDateStr,
+          endDate: endDateStr,
           pickupLocation,
           dropoffLocation,
           totalAmount,
         }
-      });
+      }).catch(err => console.log('SMS notification skipped:', err));
 
-      // Trigger post-booking TTS call
-      if (phone) {
+      let checkoutUrl = '';
+      const confirmationBase = `${window.location.origin}/booking/confirmation`;
+
+      try {
+        const { data: paymentData } = await supabase.functions.invoke('create-payment-session', {
+          body: {
+            bookingId,
+            serviceName: ride.title,
+            serviceType: 'ride',
+            totalAmount,
+            customerName: user.user_metadata?.full_name || '',
+            customerPhone: phone,
+            customerEmail: user.email,
+            startDate: startDateStr,
+            endDate: endDateStr,
+            redirectUrl: confirmationBase + '?' + new URLSearchParams({
+              status: 'confirmed',
+              serviceName: ride.title,
+              serviceType: 'ride',
+              totalAmount: String(totalAmount),
+              startDate: startDateStr,
+              endDate: endDateStr,
+              bookingId,
+              phone,
+              callStatus: 'initiated',
+            }).toString(),
+          }
+        });
+        checkoutUrl = paymentData?.checkout_url || '';
+      } catch (err) {
+        console.log('Payment session creation failed:', err);
+      }
+
+      if (mockRides[id!] && phone) {
         supabase.functions.invoke('post-booking-call', {
           body: {
             customerPhone: phone,
             serviceName: ride.title,
             type: 'ride',
             totalAmount,
-            startDate: format(dateRange.from, 'PPP'),
-            endDate: format(dateRange.to, 'PPP'),
+            startDate: startDateStr,
+            endDate: endDateStr,
           }
         }).catch(err => console.log('Voice call skipped:', err));
       }
 
-      toast({
-        title: "Booking Confirmed!",
-        description: `Your ${ride.title} has been booked for ${days} day(s).`,
+      const params = new URLSearchParams({
+        status: checkoutUrl ? 'pending_payment' : 'pending',
+        serviceName: ride.title,
+        serviceType: 'ride',
+        totalAmount: String(totalAmount),
+        startDate: startDateStr,
+        endDate: endDateStr,
+        bookingId,
+        phone,
+        callStatus: mockRides[id!] ? 'initiated' : 'pending',
+        ...(checkoutUrl ? { checkoutUrl } : {}),
       });
-      navigate('/');
+      navigate(`/booking/confirmation?${params.toString()}`);
     } catch (error: any) {
       console.error('Booking error:', error);
       toast({

@@ -269,66 +269,33 @@ const AccommodationDetailPage = () => {
     try {
       const nights = differenceInDays(dateRange.to, dateRange.from);
       const totalAmount = nights * accommodation.price_per_night;
+      const checkInStr = format(dateRange.from, 'PPP');
+      const checkOutStr = format(dateRange.to, 'PPP');
+
+      let bookingId = '';
 
       // For mock data, simulate booking
-      if (mockAccommodations[id!]) {
-        // Call edge function to send SMS notification
-        await supabase.functions.invoke('send-booking-notification', {
-          body: {
-            type: 'accommodation',
-            serviceName: accommodation.title,
-            customerPhone: phone,
-            customerEmail: user.email,
-            providerPhone: accommodation.provider?.business_phone,
-            providerEmail: accommodation.provider?.business_email,
-            checkIn: format(dateRange.from, 'PPP'),
-            checkOut: format(dateRange.to, 'PPP'),
-            guests,
-            totalAmount,
-          }
-        });
+      if (!mockAccommodations[id!]) {
+        // Real booking - insert into database
+        const { data: bookingData, error } = await supabase.from('bookings').insert({
+          user_id: user.id,
+          provider_id: accommodation.provider_id,
+          service_type: 'accommodation' as const,
+          service_id: accommodation.id,
+          check_in: format(dateRange.from, 'yyyy-MM-dd'),
+          check_out: format(dateRange.to, 'yyyy-MM-dd'),
+          guests,
+          total_amount: totalAmount,
+          notes,
+          status: 'pending'
+        }).select('id').single();
 
-        // Trigger post-booking TTS call
-        if (phone) {
-          supabase.functions.invoke('post-booking-call', {
-            body: {
-              customerPhone: phone,
-              serviceName: accommodation.title,
-              type: 'accommodation',
-              totalAmount,
-              checkIn: format(dateRange.from, 'PPP'),
-              checkOut: format(dateRange.to, 'PPP'),
-              guests,
-            }
-          }).catch(err => console.log('Voice call skipped:', err));
-        }
-
-        toast({
-          title: "Booking Confirmed!",
-          description: `Your stay at ${accommodation.title} has been booked for ${nights} night(s).`,
-        });
-        navigate('/');
-        return;
+        if (error) throw error;
+        bookingId = bookingData?.id || '';
       }
 
-      // Real booking
-      const { error } = await supabase.from('bookings').insert({
-        user_id: user.id,
-        provider_id: accommodation.provider_id,
-        service_type: 'accommodation',
-        service_id: accommodation.id,
-        check_in: format(dateRange.from, 'yyyy-MM-dd'),
-        check_out: format(dateRange.to, 'yyyy-MM-dd'),
-        guests,
-        total_amount: totalAmount,
-        notes,
-        status: 'pending'
-      });
-
-      if (error) throw error;
-
-      // Send notification via edge function
-      await supabase.functions.invoke('send-booking-notification', {
+      // Send SMS notification
+      supabase.functions.invoke('send-booking-notification', {
         body: {
           type: 'accommodation',
           serviceName: accommodation.title,
@@ -336,33 +303,81 @@ const AccommodationDetailPage = () => {
           customerEmail: user.email,
           providerPhone: accommodation.provider?.business_phone,
           providerEmail: accommodation.provider?.business_email,
-          checkIn: format(dateRange.from, 'PPP'),
-          checkOut: format(dateRange.to, 'PPP'),
+          checkIn: checkInStr,
+          checkOut: checkOutStr,
           guests,
           totalAmount,
         }
-      });
+      }).catch(err => console.log('SMS notification skipped:', err));
 
-      // Trigger post-booking TTS call
-      if (phone) {
+      // Create Snippe payment session
+      let checkoutUrl = '';
+      let callStatus = 'pending';
+      const confirmationBase = `${window.location.origin}/booking/confirmation`;
+
+      try {
+        const { data: paymentData } = await supabase.functions.invoke('create-payment-session', {
+          body: {
+            bookingId,
+            serviceName: accommodation.title,
+            serviceType: 'accommodation',
+            totalAmount,
+            customerName: user.user_metadata?.full_name || '',
+            customerPhone: phone,
+            customerEmail: user.email,
+            checkIn: checkInStr,
+            checkOut: checkOutStr,
+            guests,
+            redirectUrl: confirmationBase + '?' + new URLSearchParams({
+              status: 'confirmed',
+              serviceName: accommodation.title,
+              serviceType: 'accommodation',
+              totalAmount: String(totalAmount),
+              checkIn: checkInStr,
+              checkOut: checkOutStr,
+              guests: String(guests),
+              bookingId,
+              phone,
+              callStatus: 'initiated',
+            }).toString(),
+          }
+        });
+        checkoutUrl = paymentData?.checkout_url || '';
+      } catch (err) {
+        console.log('Payment session creation failed, proceeding without:', err);
+      }
+
+      // Trigger voice call for mock bookings (real bookings get called via webhook)
+      if (mockAccommodations[id!] && phone) {
         supabase.functions.invoke('post-booking-call', {
           body: {
             customerPhone: phone,
             serviceName: accommodation.title,
             type: 'accommodation',
             totalAmount,
-            checkIn: format(dateRange.from, 'PPP'),
-            checkOut: format(dateRange.to, 'PPP'),
+            checkIn: checkInStr,
+            checkOut: checkOutStr,
             guests,
           }
-        }).catch(err => console.log('Voice call skipped:', err));
+        }).then(() => { callStatus = 'initiated'; })
+          .catch(err => console.log('Voice call skipped:', err));
       }
 
-      toast({
-        title: "Booking Confirmed!",
-        description: `Your stay at ${accommodation.title} has been booked for ${nights} night(s).`,
+      // Navigate to confirmation page
+      const params = new URLSearchParams({
+        status: checkoutUrl ? 'pending_payment' : 'pending',
+        serviceName: accommodation.title,
+        serviceType: 'accommodation',
+        totalAmount: String(totalAmount),
+        checkIn: checkInStr,
+        checkOut: checkOutStr,
+        guests: String(guests),
+        bookingId,
+        phone,
+        callStatus: mockAccommodations[id!] ? 'initiated' : 'pending',
+        ...(checkoutUrl ? { checkoutUrl } : {}),
       });
-      navigate('/');
+      navigate(`/booking/confirmation?${params.toString()}`);
     } catch (error: any) {
       console.error('Booking error:', error);
       toast({
