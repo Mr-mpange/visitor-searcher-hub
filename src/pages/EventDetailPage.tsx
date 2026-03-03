@@ -235,92 +235,101 @@ const EventDetailPage = () => {
       const totalAmount = bookingType === "hourly" 
         ? hours * hall.price_per_hour 
         : hall.price_per_day;
+      const eventDateStr = format(selectedDate, 'PPP');
 
-      if (mockEventHalls[id!]) {
-        await supabase.functions.invoke('send-booking-notification', {
-          body: {
-            type: 'event_hall',
-            serviceName: hall.title,
-            customerPhone: phone,
-            providerPhone: hall.provider?.business_phone,
-            eventDate: format(selectedDate, 'PPP'),
-            eventType,
-            expectedGuests,
-            hours: bookingType === "hourly" ? hours : 'Full Day',
-            totalAmount,
-          }
-        });
+      let bookingId = '';
 
-        // Trigger post-booking TTS call
-        if (phone) {
-          supabase.functions.invoke('post-booking-call', {
-            body: {
-              customerPhone: phone,
-              serviceName: hall.title,
-              type: 'event_hall',
-              totalAmount,
-              eventDate: format(selectedDate, 'PPP'),
-              expectedGuests,
-            }
-          }).catch(err => console.log('Voice call skipped:', err));
-        }
+      if (!mockEventHalls[id!]) {
+        const { data: bookingData, error } = await supabase.from('bookings').insert({
+          user_id: user.id,
+          provider_id: hall.provider_id,
+          service_type: 'event_hall' as const,
+          service_id: hall.id,
+          start_date: format(selectedDate, 'yyyy-MM-dd'),
+          end_date: format(selectedDate, 'yyyy-MM-dd'),
+          guests: expectedGuests,
+          total_amount: totalAmount,
+          notes: `Event Type: ${eventType}. Duration: ${bookingType === "hourly" ? `${hours} hours` : 'Full Day'}. ${notes}`,
+          status: 'pending'
+        }).select('id').single();
 
-        toast({
-          title: "Booking Confirmed!",
-          description: `Your event at ${hall.title} has been booked for ${format(selectedDate, 'PPP')}.`,
-        });
-        navigate('/');
-        return;
+        if (error) throw error;
+        bookingId = bookingData?.id || '';
       }
 
-      const { error } = await supabase.from('bookings').insert({
-        user_id: user.id,
-        provider_id: hall.provider_id,
-        service_type: 'event_hall',
-        service_id: hall.id,
-        start_date: format(selectedDate, 'yyyy-MM-dd'),
-        end_date: format(selectedDate, 'yyyy-MM-dd'),
-        guests: expectedGuests,
-        total_amount: totalAmount,
-        notes: `Event Type: ${eventType}. Duration: ${bookingType === "hourly" ? `${hours} hours` : 'Full Day'}. ${notes}`,
-        status: 'pending'
-      });
-
-      if (error) throw error;
-
-      await supabase.functions.invoke('send-booking-notification', {
+      supabase.functions.invoke('send-booking-notification', {
         body: {
           type: 'event_hall',
           serviceName: hall.title,
           customerPhone: phone,
           providerPhone: hall.provider?.business_phone,
-          eventDate: format(selectedDate, 'PPP'),
+          eventDate: eventDateStr,
           eventType,
           expectedGuests,
           hours: bookingType === "hourly" ? hours : 'Full Day',
           totalAmount,
         }
-      });
+      }).catch(err => console.log('SMS notification skipped:', err));
 
-      // Trigger post-booking TTS call
-      if (phone) {
+      let checkoutUrl = '';
+      const confirmationBase = `${window.location.origin}/booking/confirmation`;
+
+      try {
+        const { data: paymentData } = await supabase.functions.invoke('create-payment-session', {
+          body: {
+            bookingId,
+            serviceName: hall.title,
+            serviceType: 'event_hall',
+            totalAmount,
+            customerName: user.user_metadata?.full_name || '',
+            customerPhone: phone,
+            customerEmail: user.email,
+            eventDate: eventDateStr,
+            expectedGuests,
+            redirectUrl: confirmationBase + '?' + new URLSearchParams({
+              status: 'confirmed',
+              serviceName: hall.title,
+              serviceType: 'event_hall',
+              totalAmount: String(totalAmount),
+              eventDate: eventDateStr,
+              expectedGuests: String(expectedGuests),
+              bookingId,
+              phone,
+              callStatus: 'initiated',
+            }).toString(),
+          }
+        });
+        checkoutUrl = paymentData?.checkout_url || '';
+      } catch (err) {
+        console.log('Payment session creation failed:', err);
+      }
+
+      if (mockEventHalls[id!] && phone) {
         supabase.functions.invoke('post-booking-call', {
           body: {
             customerPhone: phone,
             serviceName: hall.title,
             type: 'event_hall',
             totalAmount,
-            eventDate: format(selectedDate, 'PPP'),
+            eventDate: eventDateStr,
             expectedGuests,
           }
         }).catch(err => console.log('Voice call skipped:', err));
       }
 
-      toast({
-        title: "Booking Confirmed!",
-        description: `Your event at ${hall.title} has been booked for ${format(selectedDate, 'PPP')}.`,
+      const params = new URLSearchParams({
+        status: checkoutUrl ? 'pending_payment' : 'pending',
+        serviceName: hall.title,
+        serviceType: 'event_hall',
+        totalAmount: String(totalAmount),
+        eventDate: eventDateStr,
+        expectedGuests: String(expectedGuests),
+        bookingId,
+        phone,
+        callStatus: mockEventHalls[id!] ? 'initiated' : 'pending',
+        ...(checkoutUrl ? { checkoutUrl } : {}),
       });
-      navigate('/');
+      navigate(`/booking/confirmation?${params.toString()}`);
     } catch (error: any) {
       console.error('Booking error:', error);
       toast({

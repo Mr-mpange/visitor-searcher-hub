@@ -26,6 +26,7 @@ import AdminListingsPage from "./pages/admin/AdminListingsPage";
 import ProfilePage from "./pages/ProfilePage";
 import HowItWorksPage from "./pages/HowItWorksPage";
 import FavoritesPage from "./pages/FavoritesPage";
+import BookingConfirmationPage from "./pages/BookingConfirmationPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -49,6 +50,7 @@ const App = () => (
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/favorites" element={<FavoritesPage />} />
+          <Route path="/booking/confirmation" element={<BookingConfirmationPage />} />
           
           {/* Provider Routes */}
           <Route path="/owner/login" element={<OwnerLoginPage />} />
