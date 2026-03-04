@@ -27,6 +27,7 @@ import ProfilePage from "./pages/ProfilePage";
 import HowItWorksPage from "./pages/HowItWorksPage";
 import FavoritesPage from "./pages/FavoritesPage";
 import BookingConfirmationPage from "./pages/BookingConfirmationPage";
+import MyBookingsPage from "./pages/MyBookingsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,7 +51,8 @@ const App = () => (
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/favorites" element={<FavoritesPage />} />
-          <Route path="/booking/confirmation" element={<BookingConfirmationPage />} />
+            <Route path="/my-bookings" element={<MyBookingsPage />} />
+            <Route path="/booking/confirmation" element={<BookingConfirmationPage />} />
           
           {/* Provider Routes */}
           <Route path="/owner/login" element={<OwnerLoginPage />} />
