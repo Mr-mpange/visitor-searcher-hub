@@ -6,11 +6,21 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter
+} from "@/components/ui/dialog";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
+} from "@/components/ui/alert-dialog";
 import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  Calendar, MapPin, Users, DollarSign, Clock,
-  CheckCircle, XCircle, Loader2, Eye, Home, Car, PartyPopper
+  Calendar, Users, DollarSign, Clock,
+  CheckCircle, XCircle, Loader2, Home, Car, PartyPopper,
+  FileText, Hash
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -27,6 +37,7 @@ type Booking = {
   end_date: string | null;
   notes: string | null;
   created_at: string;
+  updated_at: string;
   service_name?: string;
 };
 
@@ -45,9 +56,44 @@ const serviceIcons: Record<string, typeof Home> = {
 
 const MyBookingsPage = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { user, loading: authLoading } = useAuth();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [cancelling, setCancelling] = useState(false);
+
+  const fetchBookings = async () => {
+    if (!user) return;
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("bookings")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching bookings:", error);
+      setLoading(false);
+      return;
+    }
+
+    const enriched = await Promise.all(
+      (data || []).map(async (b) => {
+        const table = b.service_type === "accommodation" ? "accommodations"
+          : b.service_type === "ride" ? "rides" : "event_halls";
+        const { data: svc } = await supabase
+          .from(table)
+          .select("title")
+          .eq("id", b.service_id)
+          .maybeSingle();
+        return { ...b, service_name: svc?.title || "Unknown Service" } as Booking;
+      })
+    );
+
+    setBookings(enriched);
+    setLoading(false);
+  };
 
   useEffect(() => {
     if (authLoading) return;
@@ -55,41 +101,25 @@ const MyBookingsPage = () => {
       navigate("/login");
       return;
     }
-
-    const fetchBookings = async () => {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("bookings")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.error("Error fetching bookings:", error);
-        setLoading(false);
-        return;
-      }
-
-      // Fetch service names in parallel
-      const enriched = await Promise.all(
-        (data || []).map(async (b) => {
-          const table = b.service_type === "accommodation" ? "accommodations"
-            : b.service_type === "ride" ? "rides" : "event_halls";
-          const { data: svc } = await supabase
-            .from(table)
-            .select("title")
-            .eq("id", b.service_id)
-            .maybeSingle();
-          return { ...b, service_name: svc?.title || "Unknown Service" } as Booking;
-        })
-      );
-
-      setBookings(enriched);
-      setLoading(false);
-    };
-
     fetchBookings();
   }, [user, authLoading, navigate]);
+
+  const handleCancel = async (bookingId: string) => {
+    setCancelling(true);
+    const { error } = await supabase
+      .from("bookings")
+      .update({ status: "cancelled" as const })
+      .eq("id", bookingId);
+
+    if (error) {
+      toast({ title: "Error", description: "Failed to cancel booking.", variant: "destructive" });
+    } else {
+      toast({ title: "Booking Cancelled", description: "Your booking has been cancelled successfully." });
+      setSelectedBooking(null);
+      await fetchBookings();
+    }
+    setCancelling(false);
+  };
 
   const filterBookings = (tab: string) => {
     if (tab === "all") return bookings;
@@ -147,15 +177,17 @@ const MyBookingsPage = () => {
                       const dateDisplay = getDateDisplay(booking);
 
                       return (
-                        <Card key={booking.id} className="hover:shadow-md transition-shadow">
+                        <Card
+                          key={booking.id}
+                          className="hover:shadow-md transition-shadow cursor-pointer"
+                          onClick={() => setSelectedBooking(booking)}
+                        >
                           <CardContent className="p-5">
                             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                              {/* Service icon */}
                               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                                 <ServiceIcon className="w-6 h-6 text-primary" />
                               </div>
 
-                              {/* Details */}
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-start justify-between gap-2 mb-1">
                                   <h3 className="font-semibold text-foreground truncate">{booking.service_name}</h3>
@@ -180,7 +212,6 @@ const MyBookingsPage = () => {
                                 </div>
                               </div>
 
-                              {/* Amount & actions */}
                               <div className="flex items-center gap-4 sm:flex-col sm:items-end">
                                 <span className="text-lg font-bold text-primary flex items-center">
                                   <DollarSign className="w-4 h-4" />
@@ -203,8 +234,126 @@ const MyBookingsPage = () => {
         </div>
       </main>
       <Footer />
+
+      {/* Booking Detail Dialog */}
+      <Dialog open={!!selectedBooking} onOpenChange={(open) => !open && setSelectedBooking(null)}>
+        <DialogContent className="sm:max-w-lg">
+          {selectedBooking && (() => {
+            const status = statusConfig[selectedBooking.status || "pending"] || statusConfig.pending;
+            const StatusIcon = status.icon;
+            const ServiceIcon = serviceIcons[selectedBooking.service_type] || Home;
+            const dateDisplay = getDateDisplay(selectedBooking);
+            const isPending = selectedBooking.status === "pending";
+
+            return (
+              <>
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                      <ServiceIcon className="w-5 h-5 text-primary" />
+                    </div>
+                    <span className="truncate">{selectedBooking.service_name}</span>
+                  </DialogTitle>
+                  <DialogDescription>
+                    <Badge className={`${status.bg} ${status.color} border-0 mt-2`}>
+                      <StatusIcon className="w-3 h-3 mr-1" />
+                      {status.label}
+                    </Badge>
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className="space-y-4 py-2">
+                  <div className="grid grid-cols-2 gap-4">
+                    <DetailRow icon={<Hash className="w-4 h-4" />} label="Booking ID" value={selectedBooking.id.slice(0, 8) + "..."} />
+                    <DetailRow
+                      icon={<Calendar className="w-4 h-4" />}
+                      label="Service Type"
+                      value={selectedBooking.service_type.replace("_", " ")}
+                      capitalize
+                    />
+                  </div>
+
+                  <Separator />
+
+                  {dateDisplay && (
+                    <DetailRow icon={<Calendar className="w-4 h-4" />} label="Dates" value={dateDisplay} />
+                  )}
+                  {selectedBooking.guests && (
+                    <DetailRow icon={<Users className="w-4 h-4" />} label="Guests" value={`${selectedBooking.guests}`} />
+                  )}
+
+                  <Separator />
+
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Total Amount</span>
+                    <span className="text-2xl font-bold text-primary flex items-center">
+                      <DollarSign className="w-5 h-5" />
+                      {Number(selectedBooking.total_amount).toLocaleString()}
+                    </span>
+                  </div>
+
+                  {selectedBooking.notes && (
+                    <>
+                      <Separator />
+                      <DetailRow icon={<FileText className="w-4 h-4" />} label="Notes" value={selectedBooking.notes} />
+                    </>
+                  )}
+
+                  <Separator />
+
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span>Created: {format(new Date(selectedBooking.created_at), "PPP 'at' p")}</span>
+                    <span>Updated: {format(new Date(selectedBooking.updated_at), "PPP 'at' p")}</span>
+                  </div>
+                </div>
+
+                <DialogFooter className="gap-2 sm:gap-0">
+                  {isPending && (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="destructive" disabled={cancelling}>
+                          {cancelling && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                          Cancel Booking
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Cancel this booking?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. Your booking for "{selectedBooking.service_name}" will be cancelled.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Keep Booking</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleCancel(selectedBooking.id)}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            Yes, Cancel
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
+                  <Button variant="outline" onClick={() => setSelectedBooking(null)}>Close</Button>
+                </DialogFooter>
+              </>
+            );
+          })()}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
+
+const DetailRow = ({ icon, label, value, capitalize }: { icon: React.ReactNode; label: string; value: string; capitalize?: boolean }) => (
+  <div className="flex items-start gap-3">
+    <span className="text-muted-foreground mt-0.5">{icon}</span>
+    <div>
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className={`text-sm font-medium text-foreground ${capitalize ? "capitalize" : ""}`}>{value}</p>
+    </div>
+  </div>
+);
 
 export default MyBookingsPage;
