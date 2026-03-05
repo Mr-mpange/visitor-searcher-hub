@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-import { Search, Calendar, CreditCard, PartyPopper, Phone, Globe, Star, MapPin, Users, ChevronRight, Check, Hash } from "lucide-react";
+import { useState, useEffect, useCallback, useRef, TouchEvent } from "react";
+import { Search, Calendar, CreditCard, PartyPopper, Phone, Globe, Star, MapPin, Users, ChevronRight, Check, Hash, Play, Pause } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const STEP_DURATION = 5000; // ms per step
@@ -429,10 +429,16 @@ export const HowItWorks = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [progressKey, setProgressKey] = useState(0);
   const pauseTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const ActiveScreen = phoneScreens[activeStep];
 
   const nextStep = useCallback(() => {
     setActiveStep((prev) => (prev + 1) % steps.length);
+    setProgressKey((k) => k + 1);
+  }, []);
+
+  const prevStep = useCallback(() => {
+    setActiveStep((prev) => (prev - 1 + steps.length) % steps.length);
     setProgressKey((k) => k + 1);
   }, []);
 
@@ -448,6 +454,36 @@ export const HowItWorks = () => {
     setIsPaused(true);
     if (pauseTimeoutRef.current) clearTimeout(pauseTimeoutRef.current);
     pauseTimeoutRef.current = setTimeout(() => setIsPaused(false), 10000);
+  };
+
+  const togglePause = () => {
+    setIsPaused((p) => !p);
+    if (pauseTimeoutRef.current) clearTimeout(pauseTimeoutRef.current);
+    if (!isPaused) {
+      // If we're pausing, don't auto-resume
+    } else {
+      // If we're resuming, reset progress
+      setProgressKey((k) => k + 1);
+    }
+  };
+
+  // Swipe handlers
+  const handleTouchStart = (e: TouchEvent) => {
+    touchStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  };
+
+  const handleTouchEnd = (e: TouchEvent) => {
+    if (!touchStartRef.current) return;
+    const dx = e.changedTouches[0].clientX - touchStartRef.current.x;
+    const dy = e.changedTouches[0].clientY - touchStartRef.current.y;
+    touchStartRef.current = null;
+    // Only trigger if horizontal swipe is significant and more horizontal than vertical
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      if (dx < 0) nextStep(); else prevStep();
+      setIsPaused(true);
+      if (pauseTimeoutRef.current) clearTimeout(pauseTimeoutRef.current);
+      pauseTimeoutRef.current = setTimeout(() => setIsPaused(false), 10000);
+    }
   };
 
   const accentColors: Record<string, string> = {
@@ -493,7 +529,11 @@ export const HowItWorks = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center mb-16 lg:mb-20">
           {/* Phone Simulator — shows first on mobile */}
           <div className="order-1 flex justify-center">
-            <div className="relative">
+            <div
+              className="relative"
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+            >
               <div className={cn(
                 "absolute inset-0 blur-[80px] opacity-20 rounded-full transition-colors duration-700",
                 glowColors[activeStep]
@@ -501,6 +541,18 @@ export const HowItWorks = () => {
               <PhoneFrame>
                 <ActiveScreen />
               </PhoneFrame>
+              {/* Pause/Play overlay button */}
+              <button
+                onClick={togglePause}
+                className="absolute -bottom-5 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-card border-2 border-border shadow-lg flex items-center justify-center hover:bg-muted transition-colors z-30"
+                aria-label={isPaused ? "Resume auto-play" : "Pause auto-play"}
+              >
+                {isPaused ? (
+                  <Play className="w-4 h-4 text-primary ml-0.5" />
+                ) : (
+                  <Pause className="w-4 h-4 text-primary" />
+                )}
+              </button>
             </div>
           </div>
 
