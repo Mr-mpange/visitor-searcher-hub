@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Search, Calendar, CreditCard, PartyPopper, Phone, Globe, Star, MapPin, Users, Wifi, ChevronRight, Check, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -333,7 +333,25 @@ const PhoneFrame = ({ children, isActive }: { children: React.ReactNode; isActiv
 /* ─── Main Component ─── */
 export const HowItWorks = () => {
   const [activeStep, setActiveStep] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
   const ActiveScreen = phoneScreens[activeStep];
+
+  const nextStep = useCallback(() => {
+    setActiveStep((prev) => (prev + 1) % steps.length);
+  }, []);
+
+  useEffect(() => {
+    if (isPaused) return;
+    const timer = setInterval(nextStep, 4000);
+    return () => clearInterval(timer);
+  }, [isPaused, nextStep]);
+
+  const handleStepClick = (index: number) => {
+    setActiveStep(index);
+    setIsPaused(true);
+    // Resume auto-play after 10s of inactivity
+    setTimeout(() => setIsPaused(false), 10000);
+  };
 
   const accentColors: Record<string, string> = {
     primary: "bg-primary text-primary-foreground",
@@ -374,7 +392,7 @@ export const HowItWorks = () => {
               return (
                 <button
                   key={step.id}
-                  onClick={() => setActiveStep(index)}
+                  onClick={() => handleStepClick(index)}
                   className={cn(
                     "w-full text-left rounded-2xl p-5 transition-all duration-300 border-2 group",
                     isActive
