@@ -113,13 +113,19 @@ serve(async (req) => {
         break;
         
       case 'ride':
-        smsMessage = `SafariStay Ride Booked!\n\n` +
-          `Vehicle: ${serviceName}\n` +
-          `Dates: ${startDate} - ${endDate}\n` +
-          (pickupLocation ? `Pickup: ${pickupLocation}\n` : '') +
-          (dropoffLocation ? `Dropoff: ${dropoffLocation}\n` : '') +
-          `Total: $${totalAmount}\n\n` +
-          `Safe travels with SafariStay!`;
+        smsMessage = lang === 'sw'
+          ? `SafariStay - Safari Imethibitishwa!\n\n` +
+            `Gari: ${serviceName}\n` +
+            `Tarehe: ${startDate} - ${endDate}\n` +
+            (pickupLocation ? `Mahali pa kupanda: ${pickupLocation}\n` : '') +
+            `Jumla: TSh ${totalAmount}\n\n` +
+            `Asante! Safari njema na karibu tena! 🚗`
+          : `SafariStay Ride Booked!\n\n` +
+            `Vehicle: ${serviceName}\n` +
+            `Dates: ${startDate} - ${endDate}\n` +
+            (pickupLocation ? `Pickup: ${pickupLocation}\n` : '') +
+            `Total: TSh ${totalAmount}\n\n` +
+            `Thank you! Safe travels and welcome back anytime! 🚗`;
         
         emailSubject = `Ride Booking Confirmed: ${serviceName}`;
         emailHtml = `
