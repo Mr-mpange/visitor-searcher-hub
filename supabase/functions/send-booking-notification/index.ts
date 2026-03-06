@@ -152,14 +152,19 @@ serve(async (req) => {
         break;
         
       case 'event_hall':
-        smsMessage = `SafariStay Venue Booked!\n\n` +
-          `Venue: ${serviceName}\n` +
-          `Date: ${eventDate}\n` +
-          (eventType ? `Event: ${eventType}\n` : '') +
-          `Guests: ${expectedGuests}\n` +
-          `Duration: ${hours}\n` +
-          `Total: $${totalAmount}\n\n` +
-          `Thank you for choosing SafariStay!`;
+        smsMessage = lang === 'sw'
+          ? `SafariStay - Ukumbi Umehifadhiwa!\n\n` +
+            `Ukumbi: ${serviceName}\n` +
+            `Tarehe: ${eventDate}\n` +
+            (eventType ? `Tukio: ${eventType}\n` : '') +
+            `Wageni: ${expectedGuests}\nJumla: TSh ${totalAmount}\n\n` +
+            `Asante sana! Tunakutakia tukio zuri. Karibu tena! 🎉`
+          : `SafariStay Venue Booked!\n\n` +
+            `Venue: ${serviceName}\n` +
+            `Date: ${eventDate}\n` +
+            (eventType ? `Event: ${eventType}\n` : '') +
+            `Guests: ${expectedGuests}\nTotal: TSh ${totalAmount}\n\n` +
+            `Thank you for choosing SafariStay! We wish you a wonderful event. Welcome back anytime! 🎉`;
         
         emailSubject = `Venue Booking Confirmed: ${serviceName}`;
         emailHtml = `
