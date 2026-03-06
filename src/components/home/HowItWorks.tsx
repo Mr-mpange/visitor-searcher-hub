@@ -547,7 +547,17 @@ export const HowItWorks = () => {
                 glowColors[activeStep]
               )} />
               <PhoneFrame>
-                <ActiveScreen />
+                <div
+                  key={animKey}
+                  className={cn(
+                    "w-full h-full",
+                    direction === 'next'
+                      ? "animate-[slideInRight_0.35s_ease-out]"
+                      : "animate-[slideInLeft_0.35s_ease-out]"
+                  )}
+                >
+                  <ActiveScreen />
+                </div>
               </PhoneFrame>
               {/* Pause/Play overlay button */}
               <button
