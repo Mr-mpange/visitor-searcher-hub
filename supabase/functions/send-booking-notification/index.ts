@@ -25,6 +25,7 @@ interface BookingNotification {
   dropoffLocation?: string;
   eventType?: string;
   totalAmount: number;
+  language?: 'en' | 'sw';
 }
 
 serve(async (req) => {
