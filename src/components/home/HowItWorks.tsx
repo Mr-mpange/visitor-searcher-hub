@@ -428,18 +428,24 @@ export const HowItWorks = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [progressKey, setProgressKey] = useState(0);
+  const [direction, setDirection] = useState<'next' | 'prev'>('next');
+  const [animKey, setAnimKey] = useState(0);
   const pauseTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const ActiveScreen = phoneScreens[activeStep];
 
   const nextStep = useCallback(() => {
+    setDirection('next');
     setActiveStep((prev) => (prev + 1) % steps.length);
     setProgressKey((k) => k + 1);
+    setAnimKey((k) => k + 1);
   }, []);
 
   const prevStep = useCallback(() => {
+    setDirection('prev');
     setActiveStep((prev) => (prev - 1 + steps.length) % steps.length);
     setProgressKey((k) => k + 1);
+    setAnimKey((k) => k + 1);
   }, []);
 
   useEffect(() => {
