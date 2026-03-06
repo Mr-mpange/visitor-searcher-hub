@@ -455,8 +455,10 @@ export const HowItWorks = () => {
   }, [isPaused, nextStep]);
 
   const handleStepClick = (index: number) => {
+    setDirection(index > activeStep ? 'next' : 'prev');
     setActiveStep(index);
     setProgressKey((k) => k + 1);
+    setAnimKey((k) => k + 1);
     setIsPaused(true);
     if (pauseTimeoutRef.current) clearTimeout(pauseTimeoutRef.current);
     pauseTimeoutRef.current = setTimeout(() => setIsPaused(false), 10000);
