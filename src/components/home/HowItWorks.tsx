@@ -428,18 +428,24 @@ export const HowItWorks = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [progressKey, setProgressKey] = useState(0);
+  const [direction, setDirection] = useState<'next' | 'prev'>('next');
+  const [animKey, setAnimKey] = useState(0);
   const pauseTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const ActiveScreen = phoneScreens[activeStep];
 
   const nextStep = useCallback(() => {
+    setDirection('next');
     setActiveStep((prev) => (prev + 1) % steps.length);
     setProgressKey((k) => k + 1);
+    setAnimKey((k) => k + 1);
   }, []);
 
   const prevStep = useCallback(() => {
+    setDirection('prev');
     setActiveStep((prev) => (prev - 1 + steps.length) % steps.length);
     setProgressKey((k) => k + 1);
+    setAnimKey((k) => k + 1);
   }, []);
 
   useEffect(() => {
@@ -449,8 +455,10 @@ export const HowItWorks = () => {
   }, [isPaused, nextStep]);
 
   const handleStepClick = (index: number) => {
+    setDirection(index > activeStep ? 'next' : 'prev');
     setActiveStep(index);
     setProgressKey((k) => k + 1);
+    setAnimKey((k) => k + 1);
     setIsPaused(true);
     if (pauseTimeoutRef.current) clearTimeout(pauseTimeoutRef.current);
     pauseTimeoutRef.current = setTimeout(() => setIsPaused(false), 10000);
@@ -539,7 +547,17 @@ export const HowItWorks = () => {
                 glowColors[activeStep]
               )} />
               <PhoneFrame>
-                <ActiveScreen />
+                <div
+                  key={animKey}
+                  className={cn(
+                    "w-full h-full",
+                    direction === 'next'
+                      ? "animate-[slideInRight_0.35s_ease-out]"
+                      : "animate-[slideInLeft_0.35s_ease-out]"
+                  )}
+                >
+                  <ActiveScreen />
+                </div>
               </PhoneFrame>
               {/* Pause/Play overlay button */}
               <button
