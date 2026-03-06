@@ -68,20 +68,26 @@ serve(async (req) => {
       email: { sent: false, message: '' }
     };
 
-    // Build message based on booking type
+    const lang = body.language || 'en';
+
+    // Build message based on booking type — bilingual (EN + SW)
     let smsMessage = '';
     let emailSubject = '';
     let emailHtml = '';
     
     switch (type) {
       case 'accommodation':
-        smsMessage = `SafariStay Booking Confirmed!\n\n` +
-          `Property: ${serviceName}\n` +
-          `Check-in: ${checkIn}\n` +
-          `Check-out: ${checkOut}\n` +
-          `Guests: ${guests}\n` +
-          `Total: $${totalAmount}\n\n` +
-          `Thank you for booking with SafariStay!`;
+        smsMessage = lang === 'sw'
+          ? `SafariStay - Malazi Yamethibitishwa!\n\n` +
+            `Mahali: ${serviceName}\n` +
+            `Kuingia: ${checkIn}\nKutoka: ${checkOut}\n` +
+            `Wageni: ${guests}\nJumla: TSh ${totalAmount}\n\n` +
+            `Asante sana kwa kutumia SafariStay! Karibu tena wakati wowote. 🦁`
+          : `SafariStay Booking Confirmed!\n\n` +
+            `Property: ${serviceName}\n` +
+            `Check-in: ${checkIn}\nCheck-out: ${checkOut}\n` +
+            `Guests: ${guests}\nTotal: TSh ${totalAmount}\n\n` +
+            `Thank you for booking with SafariStay! We look forward to welcoming you back. Karibu sana! 🦁`;
         
         emailSubject = `Booking Confirmed: ${serviceName}`;
         emailHtml = `
