@@ -39,30 +39,58 @@ serve(async (req) => {
           console.log(`Booking ${bookingId} confirmed via Snippe payment`);
         }
 
-        // Trigger post-booking voice call
-        const booking = await supabase
+        // Fetch full booking details
+        const { data: booking } = await supabase
           .from('bookings')
           .select('*')
           .eq('id', bookingId)
           .maybeSingle();
 
-        if (booking.data && payment?.metadata) {
-          const customerPhone = payment.customer_phone || '';
+        if (booking && payment?.metadata) {
+          const customerPhone = payment.customer_phone || payment?.customer?.phone || '';
+          const customerEmail = payment.customer_email || payment?.customer?.email || '';
+          const serviceName = payment.metadata.service_name || '';
+          const serviceType = payment.metadata.service_type || '';
+          const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+
+          // Detect language: default to Swahili for TZ numbers, English otherwise
+          const language = customerPhone.startsWith('+255') ? 'sw' : 'en';
+
+          // 1. Send thank-you SMS + email notification
+          await fetch(`${supabaseUrl}/functions/v1/send-booking-notification`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: serviceType,
+              serviceName,
+              customerPhone,
+              customerEmail,
+              totalAmount: booking.total_amount,
+              checkIn: booking.check_in,
+              checkOut: booking.check_out,
+              startDate: booking.start_date,
+              endDate: booking.end_date,
+              guests: booking.guests,
+              language,
+            }),
+          }).catch(err => console.log('SMS notification error:', err));
+
+          // 2. Trigger bilingual voice call (thank you + welcome back)
           if (customerPhone) {
-            const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
             await fetch(`${supabaseUrl}/functions/v1/post-booking-call`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 customerPhone,
-                serviceName: payment.metadata.service_name,
-                type: payment.metadata.service_type,
-                totalAmount: booking.data.total_amount,
-                checkIn: booking.data.check_in,
-                checkOut: booking.data.check_out,
-                startDate: booking.data.start_date,
-                endDate: booking.data.end_date,
-                guests: booking.data.guests,
+                serviceName,
+                type: serviceType,
+                totalAmount: booking.total_amount,
+                checkIn: booking.check_in,
+                checkOut: booking.check_out,
+                startDate: booking.start_date,
+                endDate: booking.end_date,
+                guests: booking.guests,
+                language,
               }),
             }).catch(err => console.log('Voice call trigger error:', err));
           }

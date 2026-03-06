@@ -25,6 +25,7 @@ interface BookingNotification {
   dropoffLocation?: string;
   eventType?: string;
   totalAmount: number;
+  language?: 'en' | 'sw';
 }
 
 serve(async (req) => {
@@ -67,20 +68,26 @@ serve(async (req) => {
       email: { sent: false, message: '' }
     };
 
-    // Build message based on booking type
+    const lang = body.language || 'en';
+
+    // Build message based on booking type — bilingual (EN + SW)
     let smsMessage = '';
     let emailSubject = '';
     let emailHtml = '';
     
     switch (type) {
       case 'accommodation':
-        smsMessage = `SafariStay Booking Confirmed!\n\n` +
-          `Property: ${serviceName}\n` +
-          `Check-in: ${checkIn}\n` +
-          `Check-out: ${checkOut}\n` +
-          `Guests: ${guests}\n` +
-          `Total: $${totalAmount}\n\n` +
-          `Thank you for booking with SafariStay!`;
+        smsMessage = lang === 'sw'
+          ? `SafariStay - Malazi Yamethibitishwa!\n\n` +
+            `Mahali: ${serviceName}\n` +
+            `Kuingia: ${checkIn}\nKutoka: ${checkOut}\n` +
+            `Wageni: ${guests}\nJumla: TSh ${totalAmount}\n\n` +
+            `Asante sana kwa kutumia SafariStay! Karibu tena wakati wowote. 🦁`
+          : `SafariStay Booking Confirmed!\n\n` +
+            `Property: ${serviceName}\n` +
+            `Check-in: ${checkIn}\nCheck-out: ${checkOut}\n` +
+            `Guests: ${guests}\nTotal: TSh ${totalAmount}\n\n` +
+            `Thank you for booking with SafariStay! We look forward to welcoming you back. Karibu sana! 🦁`;
         
         emailSubject = `Booking Confirmed: ${serviceName}`;
         emailHtml = `
@@ -106,13 +113,19 @@ serve(async (req) => {
         break;
         
       case 'ride':
-        smsMessage = `SafariStay Ride Booked!\n\n` +
-          `Vehicle: ${serviceName}\n` +
-          `Dates: ${startDate} - ${endDate}\n` +
-          (pickupLocation ? `Pickup: ${pickupLocation}\n` : '') +
-          (dropoffLocation ? `Dropoff: ${dropoffLocation}\n` : '') +
-          `Total: $${totalAmount}\n\n` +
-          `Safe travels with SafariStay!`;
+        smsMessage = lang === 'sw'
+          ? `SafariStay - Safari Imethibitishwa!\n\n` +
+            `Gari: ${serviceName}\n` +
+            `Tarehe: ${startDate} - ${endDate}\n` +
+            (pickupLocation ? `Mahali pa kupanda: ${pickupLocation}\n` : '') +
+            `Jumla: TSh ${totalAmount}\n\n` +
+            `Asante! Safari njema na karibu tena! 🚗`
+          : `SafariStay Ride Booked!\n\n` +
+            `Vehicle: ${serviceName}\n` +
+            `Dates: ${startDate} - ${endDate}\n` +
+            (pickupLocation ? `Pickup: ${pickupLocation}\n` : '') +
+            `Total: TSh ${totalAmount}\n\n` +
+            `Thank you! Safe travels and welcome back anytime! 🚗`;
         
         emailSubject = `Ride Booking Confirmed: ${serviceName}`;
         emailHtml = `
@@ -139,14 +152,19 @@ serve(async (req) => {
         break;
         
       case 'event_hall':
-        smsMessage = `SafariStay Venue Booked!\n\n` +
-          `Venue: ${serviceName}\n` +
-          `Date: ${eventDate}\n` +
-          (eventType ? `Event: ${eventType}\n` : '') +
-          `Guests: ${expectedGuests}\n` +
-          `Duration: ${hours}\n` +
-          `Total: $${totalAmount}\n\n` +
-          `Thank you for choosing SafariStay!`;
+        smsMessage = lang === 'sw'
+          ? `SafariStay - Ukumbi Umehifadhiwa!\n\n` +
+            `Ukumbi: ${serviceName}\n` +
+            `Tarehe: ${eventDate}\n` +
+            (eventType ? `Tukio: ${eventType}\n` : '') +
+            `Wageni: ${expectedGuests}\nJumla: TSh ${totalAmount}\n\n` +
+            `Asante sana! Tunakutakia tukio zuri. Karibu tena! 🎉`
+          : `SafariStay Venue Booked!\n\n` +
+            `Venue: ${serviceName}\n` +
+            `Date: ${eventDate}\n` +
+            (eventType ? `Event: ${eventType}\n` : '') +
+            `Guests: ${expectedGuests}\nTotal: TSh ${totalAmount}\n\n` +
+            `Thank you for choosing SafariStay! We wish you a wonderful event. Welcome back anytime! 🎉`;
         
         emailSubject = `Venue Booking Confirmed: ${serviceName}`;
         emailHtml = `
