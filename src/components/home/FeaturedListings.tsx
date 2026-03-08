@@ -198,7 +198,7 @@ export const FeaturedListings = () => {
                   </div>
                   <div>
                     <span className="text-lg font-bold text-foreground">${listing.price}</span>
-                    <span className="text-muted-foreground text-sm">/night</span>
+                    <span className="text-muted-foreground text-sm">{t("per_night")}</span>
                   </div>
                 </div>
               </div>
