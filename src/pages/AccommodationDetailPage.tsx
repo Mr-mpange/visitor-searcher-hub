@@ -361,6 +361,7 @@ const AccommodationDetailPage = () => {
             checkIn: checkInStr,
             checkOut: checkOutStr,
             guests,
+            language,
           }
         }).then(() => { callStatus = 'initiated'; })
           .catch(err => console.log('Voice call skipped:', err));

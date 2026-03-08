@@ -316,6 +316,7 @@ const EventDetailPage = () => {
             totalAmount,
             eventDate: eventDateStr,
             expectedGuests,
+            language,
           }
         }).catch(err => console.log('Voice call skipped:', err));
       }

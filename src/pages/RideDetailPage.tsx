@@ -314,6 +314,7 @@ const RideDetailPage = () => {
             totalAmount,
             startDate: startDateStr,
             endDate: endDateStr,
+            language,
           }
         }).catch(err => console.log('Voice call skipped:', err));
       }
