@@ -1,26 +1,6 @@
 import { Link } from "react-router-dom";
 import { MapPin, Phone, Mail, Facebook, Twitter, Instagram, Youtube } from "lucide-react";
-
-const footerLinks = {
-  services: [
-    { label: "Accommodation", href: "/accommodation" },
-    { label: "Rides", href: "/rides" },
-    { label: "Event Halls", href: "/events" },
-    { label: "USSD Booking", href: "/ussd" },
-  ],
-  company: [
-    { label: "About Us", href: "/about" },
-    { label: "How It Works", href: "/how-it-works" },
-    { label: "Become a Provider", href: "/owner/signup" },
-    { label: "Careers", href: "/careers" },
-  ],
-  support: [
-    { label: "Help Center", href: "/help" },
-    { label: "Contact Us", href: "/contact" },
-    { label: "Privacy Policy", href: "/privacy" },
-    { label: "Terms of Service", href: "/terms" },
-  ],
-};
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const socialLinks = [
   { icon: Facebook, href: "#", label: "Facebook" },
@@ -30,12 +10,33 @@ const socialLinks = [
 ];
 
 export const Footer = () => {
+  const { t } = useLanguage();
+
+  const footerLinks = {
+    services: [
+      { label: t("accommodation"), href: "/accommodation" },
+      { label: t("rides"), href: "/rides" },
+      { label: t("event_halls"), href: "/events" },
+      { label: t("ussd_booking"), href: "/ussd" },
+    ],
+    company: [
+      { label: t("about_us"), href: "/about" },
+      { label: t("how_it_works"), href: "/how-it-works" },
+      { label: t("become_provider"), href: "/owner/signup" },
+      { label: t("careers"), href: "/careers" },
+    ],
+    support: [
+      { label: t("help_center"), href: "/help" },
+      { label: t("contact_us"), href: "/contact" },
+      { label: t("privacy_policy"), href: "/privacy" },
+      { label: t("terms_of_service"), href: "/terms" },
+    ],
+  };
+
   return (
     <footer className="bg-foreground text-primary-foreground">
       <div className="container mx-auto px-4 lg:px-8">
-        {/* Main Footer */}
         <div className="py-12 lg:py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
-          {/* Brand */}
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center gap-2 mb-4">
               <div className="w-10 h-10 rounded-xl bg-gradient-coral flex items-center justify-center">
@@ -46,7 +47,7 @@ export const Footer = () => {
               </span>
             </Link>
             <p className="text-primary-foreground/70 text-sm leading-relaxed mb-6 max-w-sm">
-              Your trusted platform for accommodation, rides, and event venues across Africa. Experience seamless booking via web and USSD.
+              {t("footer_desc")}
             </p>
             <div className="space-y-3 text-sm text-primary-foreground/70">
               <div className="flex items-center gap-3">
@@ -60,16 +61,12 @@ export const Footer = () => {
             </div>
           </div>
 
-          {/* Services */}
           <div>
-            <h4 className="font-semibold mb-4">Services</h4>
+            <h4 className="font-semibold mb-4">{t("services")}</h4>
             <ul className="space-y-3">
               {footerLinks.services.map((link) => (
                 <li key={link.label}>
-                  <Link
-                    to={link.href}
-                    className="text-sm text-primary-foreground/70 hover:text-accent transition-colors"
-                  >
+                  <Link to={link.href} className="text-sm text-primary-foreground/70 hover:text-accent transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -77,16 +74,12 @@ export const Footer = () => {
             </ul>
           </div>
 
-          {/* Company */}
           <div>
-            <h4 className="font-semibold mb-4">Company</h4>
+            <h4 className="font-semibold mb-4">{t("company")}</h4>
             <ul className="space-y-3">
               {footerLinks.company.map((link) => (
                 <li key={link.label}>
-                  <Link
-                    to={link.href}
-                    className="text-sm text-primary-foreground/70 hover:text-accent transition-colors"
-                  >
+                  <Link to={link.href} className="text-sm text-primary-foreground/70 hover:text-accent transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -94,16 +87,12 @@ export const Footer = () => {
             </ul>
           </div>
 
-          {/* Support */}
           <div>
-            <h4 className="font-semibold mb-4">Support</h4>
+            <h4 className="font-semibold mb-4">{t("support")}</h4>
             <ul className="space-y-3">
               {footerLinks.support.map((link) => (
                 <li key={link.label}>
-                  <Link
-                    to={link.href}
-                    className="text-sm text-primary-foreground/70 hover:text-accent transition-colors"
-                  >
+                  <Link to={link.href} className="text-sm text-primary-foreground/70 hover:text-accent transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -112,10 +101,9 @@ export const Footer = () => {
           </div>
         </div>
 
-        {/* Bottom Bar */}
         <div className="py-6 border-t border-primary-foreground/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-primary-foreground/50">
-            © {new Date().getFullYear()} SafariStay. All rights reserved.
+            © {new Date().getFullYear()} SafariStay. {t("all_rights_reserved")}
           </p>
           <div className="flex items-center gap-4">
             {socialLinks.map((social) => (
