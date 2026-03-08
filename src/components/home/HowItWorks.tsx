@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback, useRef, TouchEvent } from "react";
 import { Search, Calendar, CreditCard, PartyPopper, Phone, Globe, Star, MapPin, Users, ChevronRight, Check, Hash, Play, Pause } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { cn } from "@/lib/utils";
 
 const STEP_DURATION = 5000; // ms per step
 
