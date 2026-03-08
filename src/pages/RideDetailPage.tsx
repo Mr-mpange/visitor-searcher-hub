@@ -268,6 +268,7 @@ const RideDetailPage = () => {
           pickupLocation,
           dropoffLocation,
           totalAmount,
+          language,
         }
       }).catch(err => console.log('SMS notification skipped:', err));
 
