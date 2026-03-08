@@ -596,6 +596,9 @@ const EventDetailPage = () => {
                     />
                   </div>
 
+                  {/* Language Preference */}
+                  <LanguageSelector value={language} onChange={setLanguage} />
+
                   <div>
                     <Label htmlFor="notes">Special Requests (Optional)</Label>
                     <Textarea

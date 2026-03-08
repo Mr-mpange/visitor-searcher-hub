@@ -567,6 +567,9 @@ const RideDetailPage = () => {
                     />
                   </div>
 
+                  {/* Language Preference */}
+                  <LanguageSelector value={language} onChange={setLanguage} />
+
                   <div>
                     <Label htmlFor="notes">Notes (Optional)</Label>
                     <Textarea

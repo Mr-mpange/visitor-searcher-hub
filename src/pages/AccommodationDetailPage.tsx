@@ -641,6 +641,9 @@ const AccommodationDetailPage = () => {
                     />
                   </div>
 
+                  {/* Language Preference */}
+                  <LanguageSelector value={language} onChange={setLanguage} />
+
                   {/* Notes */}
                   <div>
                     <Label htmlFor="notes">Special Requests (Optional)</Label>
