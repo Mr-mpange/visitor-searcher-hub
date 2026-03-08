@@ -103,18 +103,18 @@ export const FeaturedListings = () => {
 
           {/* Filters */}
           <div className="flex gap-2 flex-wrap">
-            {filters.map((filter) => (
+            {filterKeys.map((filterKey) => (
               <button
-                key={filter}
-                onClick={() => setActiveFilter(filter)}
+                key={filterKey}
+                onClick={() => setActiveFilter(filterKey)}
                 className={cn(
                   "px-4 py-2 rounded-full text-sm font-medium transition-all",
-                  activeFilter === filter
+                  activeFilter === filterKey
                     ? "bg-primary text-primary-foreground shadow-md"
                     : "bg-card text-muted-foreground hover:bg-secondary"
                 )}
               >
-                {filter}
+                {t(filterKey)}
               </button>
             ))}
           </div>
