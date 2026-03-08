@@ -503,7 +503,7 @@ const EventDetailPage = () => {
             </div>
 
             <div className="lg:col-span-1">
-              <Card className="sticky top-24">
+              <Card className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto">
                 <CardHeader>
                   <div className="space-y-1">
                     <div className="flex items-baseline gap-2">
