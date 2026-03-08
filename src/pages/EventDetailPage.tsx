@@ -166,6 +166,7 @@ const EventDetailPage = () => {
   const [eventType, setEventType] = useState("");
   const [phone, setPhone] = useState("");
   const [notes, setNotes] = useState("");
+  const [language, setLanguage] = useState<LanguageCode>("en");
   const [isBooking, setIsBooking] = useState(false);
   const [bookingType, setBookingType] = useState<"hourly" | "daily">("hourly");
 

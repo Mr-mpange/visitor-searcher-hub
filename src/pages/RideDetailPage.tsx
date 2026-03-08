@@ -166,6 +166,7 @@ const RideDetailPage = () => {
   const [pickupLocation, setPickupLocation] = useState("");
   const [dropoffLocation, setDropoffLocation] = useState("");
   const [notes, setNotes] = useState("");
+  const [language, setLanguage] = useState<LanguageCode>("en");
   const [isBooking, setIsBooking] = useState(false);
 
   useEffect(() => {

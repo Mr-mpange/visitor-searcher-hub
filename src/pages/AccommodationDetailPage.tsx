@@ -199,6 +199,7 @@ const AccommodationDetailPage = () => {
   const [guests, setGuests] = useState(2);
   const [phone, setPhone] = useState("");
   const [notes, setNotes] = useState("");
+  const [language, setLanguage] = useState<LanguageCode>("en");
   const [isBooking, setIsBooking] = useState(false);
 
   useEffect(() => {
