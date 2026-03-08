@@ -270,6 +270,7 @@ const EventDetailPage = () => {
           expectedGuests,
           hours: bookingType === "hourly" ? hours : 'Full Day',
           totalAmount,
+          language,
         }
       }).catch(err => console.log('SMS notification skipped:', err));
 
