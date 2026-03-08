@@ -6,42 +6,12 @@ import { cn } from "@/lib/utils";
 
 const STEP_DURATION = 5000; // ms per step
 
-const steps = [
-  {
-    id: 1,
-    icon: Search,
-    title: "Search & Discover",
-    description: "Browse curated listings of accommodations, rides, and event venues across Africa.",
-    accent: "primary",
-  },
-  {
-    id: 2,
-    icon: Calendar,
-    title: "Select & Customize",
-    description: "Choose your dates, guests, and any special requirements for your perfect stay.",
-    accent: "accent",
-  },
-  {
-    id: 3,
-    icon: CreditCard,
-    title: "Book & Pay",
-    description: "Secure your reservation with mobile money, card, or USSD — whatever suits you.",
-    accent: "success",
-  },
-  {
-    id: 4,
-    icon: PartyPopper,
-    title: "Enjoy Your Stay",
-    description: "Receive instant confirmation via SMS & voice call, then enjoy world-class hospitality.",
-    accent: "warning",
-  },
-  {
-    id: 5,
-    icon: Phone,
-    title: "USSD Booking",
-    description: "No internet? Dial *384*123# from any phone to book — works on every network.",
-    accent: "destructive",
-  },
+const stepKeys = [
+  { id: 1, icon: Search, titleKey: "step_search", descKey: "step_search_desc", accent: "primary" },
+  { id: 2, icon: Calendar, titleKey: "step_select", descKey: "step_select_desc", accent: "accent" },
+  { id: 3, icon: CreditCard, titleKey: "step_book", descKey: "step_book_desc", accent: "success" },
+  { id: 4, icon: PartyPopper, titleKey: "step_enjoy", descKey: "step_enjoy_desc", accent: "warning" },
+  { id: 5, icon: Phone, titleKey: "step_ussd", descKey: "step_ussd_desc", accent: "destructive" },
 ];
 
 /* ─── Simulated Phone Screens ─── */
