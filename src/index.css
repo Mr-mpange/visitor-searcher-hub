@@ -88,7 +88,7 @@
     --popover-foreground: 210 20% 95%;
 
     --primary: 185 55% 45%;
-    --primary-foreground: 220 25% 8%;
+    --primary-foreground: 0 0% 100%;
 
     --secondary: 35 25% 20%;
     --secondary-foreground: 35 40% 85%;
@@ -96,11 +96,11 @@
     --muted: 220 15% 18%;
     --muted-foreground: 220 10% 65%;
 
-    --accent: 15 75% 50%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 15 75% 55%;
+    --accent-foreground: 220 25% 8%;
 
     --success: 145 50% 45%;
-    --success-foreground: 0 0% 100%;
+    --success-foreground: 220 25% 8%;
 
     --destructive: 0 65% 45%;
     --destructive-foreground: 0 0% 100%;
@@ -174,7 +174,7 @@
   }
 
   .glass {
-    background: hsl(0 0% 100% / 0.8);
+    background: hsl(var(--background) / 0.8);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
   }
