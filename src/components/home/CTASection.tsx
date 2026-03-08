@@ -1,49 +1,48 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Building, Shield, Headphones } from "lucide-react";
-
-const benefits = [
-  {
-    icon: Building,
-    title: "List Your Property",
-    description: "Reach thousands of travelers across Africa",
-  },
-  {
-    icon: Shield,
-    title: "Secure Payments",
-    description: "Get paid safely and on time, every time",
-  },
-  {
-    icon: Headphones,
-    title: "24/7 Support",
-    description: "Our team is always here to help you succeed",
-  },
-];
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const CTASection = () => {
+  const { t } = useLanguage();
+
+  const benefits = [
+    {
+      icon: Building,
+      title: t("list_property"),
+      description: t("list_property_desc"),
+    },
+    {
+      icon: Shield,
+      title: t("secure_payments"),
+      description: t("secure_payments_desc"),
+    },
+    {
+      icon: Headphones,
+      title: t("support_24_7"),
+      description: t("support_24_7_desc"),
+    },
+  ];
+
   return (
     <section className="py-20 lg:py-28 bg-background">
       <div className="container mx-auto px-4 lg:px-8">
         <div className="bg-gradient-coral rounded-3xl overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-2">
-            {/* Left Content */}
             <div className="p-8 lg:p-12 xl:p-16">
               <span className="inline-block px-4 py-1.5 rounded-full bg-primary-foreground/20 text-primary-foreground text-sm font-medium mb-6">
-                For Service Providers
+                {t("cta_badge")}
               </span>
-
               <h2 className="text-3xl lg:text-4xl xl:text-5xl font-display font-bold text-primary-foreground mb-4 leading-tight">
-                Grow Your Business with SafariStay
+                {t("cta_title")}
               </h2>
-
               <p className="text-primary-foreground/80 text-lg mb-8 max-w-md">
-                Join thousands of property owners, vehicle operators, and event venue managers already earning with us.
+                {t("cta_subtitle")}
               </p>
-
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button variant="heroOutline" size="xl" asChild>
                   <Link to="/owner/signup">
-                    Become a Partner <ArrowRight className="w-5 h-5" />
+                    {t("become_partner")} <ArrowRight className="w-5 h-5" />
                   </Link>
                 </Button>
                 <Button
@@ -52,13 +51,11 @@ export const CTASection = () => {
                   asChild
                 >
                   <Link to="/owner/login">
-                    Partner Login
+                    {t("partner_login")}
                   </Link>
                 </Button>
               </div>
             </div>
-
-            {/* Right Content - Benefits */}
             <div className="bg-primary-foreground/10 backdrop-blur-sm p-8 lg:p-12 flex items-center">
               <div className="space-y-6 w-full">
                 {benefits.map((benefit) => (

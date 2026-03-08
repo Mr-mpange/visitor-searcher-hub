@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Star, ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const testimonials = [
   {
@@ -43,6 +44,7 @@ const testimonials = [
 
 export const Testimonials = () => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const { t } = useLanguage();
 
   const nextTestimonial = () => {
     setActiveIndex((prev) => (prev + 1) % testimonials.length);
@@ -55,39 +57,29 @@ export const Testimonials = () => {
   return (
     <section className="py-20 lg:py-28 bg-muted/50">
       <div className="container mx-auto px-4 lg:px-8">
-        {/* Section Header */}
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-foreground mb-4">
-            What Our Guests Say
+            {t("testimonials_title")}
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Don't just take our word for it. Here's what travelers across Africa have to say.
+            {t("testimonials_subtitle")}
           </p>
         </div>
 
-        {/* Testimonials Carousel */}
         <div className="max-w-4xl mx-auto">
           <div className="relative bg-card rounded-3xl p-8 lg:p-12 shadow-lg">
-            {/* Quote Icon */}
             <div className="absolute top-6 right-8 text-primary/10">
               <Quote className="w-24 h-24" />
             </div>
-
-            {/* Content */}
             <div className="relative z-10">
-              {/* Rating */}
               <div className="flex gap-1 mb-6">
                 {[...Array(testimonials[activeIndex].rating)].map((_, i) => (
                   <Star key={i} className="w-5 h-5 fill-warning text-warning" />
                 ))}
               </div>
-
-              {/* Text */}
               <p className="text-lg lg:text-xl text-foreground leading-relaxed mb-8">
                 "{testimonials[activeIndex].text}"
               </p>
-
-              {/* Author */}
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-semibold text-lg">
                   {testimonials[activeIndex].avatar}
@@ -102,8 +94,6 @@ export const Testimonials = () => {
                 </div>
               </div>
             </div>
-
-            {/* Navigation */}
             <div className="absolute bottom-8 right-8 flex gap-2">
               <button
                 onClick={prevTestimonial}
@@ -121,8 +111,6 @@ export const Testimonials = () => {
               </button>
             </div>
           </div>
-
-          {/* Dots */}
           <div className="flex justify-center gap-2 mt-6">
             {testimonials.map((_, index) => (
               <button
