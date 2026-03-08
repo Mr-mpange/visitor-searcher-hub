@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { LanguageSelector, type LanguageCode } from "@/components/booking/LanguageSelector";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -165,6 +166,7 @@ const RideDetailPage = () => {
   const [pickupLocation, setPickupLocation] = useState("");
   const [dropoffLocation, setDropoffLocation] = useState("");
   const [notes, setNotes] = useState("");
+  const [language, setLanguage] = useState<LanguageCode>("en");
   const [isBooking, setIsBooking] = useState(false);
 
   useEffect(() => {
@@ -266,6 +268,7 @@ const RideDetailPage = () => {
           pickupLocation,
           dropoffLocation,
           totalAmount,
+          language,
         }
       }).catch(err => console.log('SMS notification skipped:', err));
 
@@ -311,6 +314,7 @@ const RideDetailPage = () => {
             totalAmount,
             startDate: startDateStr,
             endDate: endDateStr,
+            language,
           }
         }).catch(err => console.log('Voice call skipped:', err));
       }
@@ -564,6 +568,9 @@ const RideDetailPage = () => {
                       className="mt-1"
                     />
                   </div>
+
+                  {/* Language Preference */}
+                  <LanguageSelector value={language} onChange={setLanguage} />
 
                   <div>
                     <Label htmlFor="notes">Notes (Optional)</Label>

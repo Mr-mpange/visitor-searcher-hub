@@ -6,6 +6,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { User, Camera, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { LanguageSelector, type LanguageCode } from "@/components/booking/LanguageSelector";
 
 interface ProfileEditFormProps {
   userId: string;
@@ -13,6 +14,7 @@ interface ProfileEditFormProps {
     full_name?: string | null;
     phone?: string | null;
     avatar_url?: string | null;
+    preferred_language?: string | null;
   };
   onSaved: () => void;
 }
@@ -21,6 +23,7 @@ export const ProfileEditForm = ({ userId, profile, onSaved }: ProfileEditFormPro
   const [fullName, setFullName] = useState(profile.full_name || "");
   const [phone, setPhone] = useState(profile.phone || "");
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url || "");
+  const [language, setLanguage] = useState<LanguageCode>((profile.preferred_language as LanguageCode) || "en");
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -60,7 +63,8 @@ export const ProfileEditForm = ({ userId, profile, onSaved }: ProfileEditFormPro
         full_name: fullName,
         phone,
         avatar_url: avatarUrl.split("?")[0],
-      })
+        preferred_language: language,
+      } as any)
       .eq("id", userId);
 
     if (error) {
@@ -125,6 +129,13 @@ export const ProfileEditForm = ({ userId, profile, onSaved }: ProfileEditFormPro
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             placeholder="+254 7XX XXX XXX"
+          />
+        </div>
+        <div className="space-y-2">
+          <LanguageSelector
+            value={language}
+            onChange={setLanguage}
+            label="Preferred Notification Language"
           />
         </div>
       </div>

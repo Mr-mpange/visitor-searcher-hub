@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { LanguageSelector, type LanguageCode } from "@/components/booking/LanguageSelector";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -198,6 +199,7 @@ const AccommodationDetailPage = () => {
   const [guests, setGuests] = useState(2);
   const [phone, setPhone] = useState("");
   const [notes, setNotes] = useState("");
+  const [language, setLanguage] = useState<LanguageCode>("en");
   const [isBooking, setIsBooking] = useState(false);
 
   useEffect(() => {
@@ -307,6 +309,7 @@ const AccommodationDetailPage = () => {
           checkOut: checkOutStr,
           guests,
           totalAmount,
+          language,
         }
       }).catch(err => console.log('SMS notification skipped:', err));
 
@@ -358,6 +361,7 @@ const AccommodationDetailPage = () => {
             checkIn: checkInStr,
             checkOut: checkOutStr,
             guests,
+            language,
           }
         }).then(() => { callStatus = 'initiated'; })
           .catch(err => console.log('Voice call skipped:', err));
@@ -638,6 +642,9 @@ const AccommodationDetailPage = () => {
                       className="mt-1"
                     />
                   </div>
+
+                  {/* Language Preference */}
+                  <LanguageSelector value={language} onChange={setLanguage} />
 
                   {/* Notes */}
                   <div>

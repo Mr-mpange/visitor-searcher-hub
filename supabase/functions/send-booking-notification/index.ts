@@ -70,103 +70,44 @@ serve(async (req) => {
 
     const lang = body.language || 'en';
 
-    // Build message based on booking type — bilingual (EN + SW)
+    // Build SMS message based on booking type and language
     let smsMessage = '';
     let emailSubject = '';
     let emailHtml = '';
+
+    // Multi-language SMS templates
+    const smsTemplates: Record<string, Record<string, string>> = {
+      accommodation: {
+        en: `SafariStay Booking Confirmed! 🦁\n\nProperty: ${serviceName}\nCheck-in: ${checkIn}\nCheck-out: ${checkOut}\nGuests: ${guests}\nTotal: TSh ${totalAmount}\n\nThank you! We look forward to welcoming you back. Karibu sana!`,
+        sw: `SafariStay - Malazi Yamethibitishwa! 🦁\n\nMahali: ${serviceName}\nKuingia: ${checkIn}\nKutoka: ${checkOut}\nWageni: ${guests}\nJumla: TSh ${totalAmount}\n\nAsante sana! Karibu tena wakati wowote!`,
+        fr: `SafariStay - Réservation Confirmée! 🦁\n\nHébergement: ${serviceName}\nArrivée: ${checkIn}\nDépart: ${checkOut}\nPersonnes: ${guests}\nTotal: TSh ${totalAmount}\n\nMerci! Nous avons hâte de vous revoir!`,
+        ar: `SafariStay - تم تأكيد الحجز! 🦁\n\nمكان الإقامة: ${serviceName}\nالوصول: ${checkIn}\nالمغادرة: ${checkOut}\nالضيوف: ${guests}\nالمجموع: ${totalAmount} شلن\n\nشكراً لكم! نتطلع لاستقبالكم مجدداً!`,
+        pt: `SafariStay - Reserva Confirmada! 🦁\n\nPropriedade: ${serviceName}\nCheck-in: ${checkIn}\nCheck-out: ${checkOut}\nHóspedes: ${guests}\nTotal: TSh ${totalAmount}\n\nObrigado! Esperamos recebê-lo novamente!`,
+        so: `SafariStay - Buukinta Waa La Xaqiijiyay! 🦁\n\nGoob: ${serviceName}\nSoo gal: ${checkIn}\nKa bax: ${checkOut}\nMartida: ${guests}\nWadarta: TSh ${totalAmount}\n\nWaad ku mahadsan tahay! Soo dhowoow mar kale!`,
+      },
+      ride: {
+        en: `SafariStay Ride Booked! 🚗\n\nVehicle: ${serviceName}\nDates: ${startDate} - ${endDate}\n${pickupLocation ? `Pickup: ${pickupLocation}\n` : ''}Total: TSh ${totalAmount}\n\nThank you! Safe travels and welcome back anytime!`,
+        sw: `SafariStay - Safari Imethibitishwa! 🚗\n\nGari: ${serviceName}\nTarehe: ${startDate} - ${endDate}\n${pickupLocation ? `Mahali: ${pickupLocation}\n` : ''}Jumla: TSh ${totalAmount}\n\nAsante! Safari njema na karibu tena!`,
+        fr: `SafariStay - Trajet Confirmé! 🚗\n\nVéhicule: ${serviceName}\nDates: ${startDate} - ${endDate}\n${pickupLocation ? `Départ: ${pickupLocation}\n` : ''}Total: TSh ${totalAmount}\n\nMerci! Bon voyage et à bientôt!`,
+        ar: `SafariStay - تم تأكيد الرحلة! 🚗\n\nالمركبة: ${serviceName}\nالتواريخ: ${startDate} - ${endDate}\n${pickupLocation ? `نقطة الانطلاق: ${pickupLocation}\n` : ''}المجموع: ${totalAmount} شلن\n\nشكراً! رحلة آمنة ونرحب بعودتكم!`,
+        pt: `SafariStay - Viagem Confirmada! 🚗\n\nVeículo: ${serviceName}\nDatas: ${startDate} - ${endDate}\n${pickupLocation ? `Embarque: ${pickupLocation}\n` : ''}Total: TSh ${totalAmount}\n\nObrigado! Boa viagem e volte sempre!`,
+        so: `SafariStay - Rakaabka Waa La Xaqiijiyay! 🚗\n\nGaari: ${serviceName}\nTaariikhda: ${startDate} - ${endDate}\n${pickupLocation ? `Goobta: ${pickupLocation}\n` : ''}Wadarta: TSh ${totalAmount}\n\nWaad ku mahadsan tahay! Safar wanaagsan!`,
+      },
+      event_hall: {
+        en: `SafariStay Venue Booked! 🎉\n\nVenue: ${serviceName}\nDate: ${eventDate}\n${eventType ? `Event: ${eventType}\n` : ''}Guests: ${expectedGuests}\nTotal: TSh ${totalAmount}\n\nThank you! We wish you a wonderful event. Welcome back anytime!`,
+        sw: `SafariStay - Ukumbi Umehifadhiwa! 🎉\n\nUkumbi: ${serviceName}\nTarehe: ${eventDate}\n${eventType ? `Tukio: ${eventType}\n` : ''}Wageni: ${expectedGuests}\nJumla: TSh ${totalAmount}\n\nAsante sana! Karibu tena!`,
+        fr: `SafariStay - Salle Réservée! 🎉\n\nSalle: ${serviceName}\nDate: ${eventDate}\n${eventType ? `Événement: ${eventType}\n` : ''}Invités: ${expectedGuests}\nTotal: TSh ${totalAmount}\n\nMerci! Nous vous souhaitons un événement formidable!`,
+        ar: `SafariStay - تم حجز القاعة! 🎉\n\nالقاعة: ${serviceName}\nالتاريخ: ${eventDate}\n${eventType ? `الحدث: ${eventType}\n` : ''}الضيوف: ${expectedGuests}\nالمجموع: ${totalAmount} شلن\n\nشكراً! نتمنى لكم حدثاً رائعاً!`,
+        pt: `SafariStay - Salão Reservado! 🎉\n\nSalão: ${serviceName}\nData: ${eventDate}\n${eventType ? `Evento: ${eventType}\n` : ''}Convidados: ${expectedGuests}\nTotal: TSh ${totalAmount}\n\nObrigado! Desejamos um evento incrível!`,
+        so: `SafariStay - Qolka Waa La Kaydiyay! 🎉\n\nQolka: ${serviceName}\nTaariikhda: ${eventDate}\n${eventType ? `Munaasabadda: ${eventType}\n` : ''}Martida: ${expectedGuests}\nWadarta: TSh ${totalAmount}\n\nWaad ku mahadsan tahay! Munaasabad wanaagsan!`,
+      },
+    };
+
+    smsMessage = smsTemplates[type]?.[lang] || smsTemplates[type]?.en || '';
     
     switch (type) {
       case 'accommodation':
-        smsMessage = lang === 'sw'
-          ? `SafariStay - Malazi Yamethibitishwa!\n\n` +
-            `Mahali: ${serviceName}\n` +
-            `Kuingia: ${checkIn}\nKutoka: ${checkOut}\n` +
-            `Wageni: ${guests}\nJumla: TSh ${totalAmount}\n\n` +
-            `Asante sana kwa kutumia SafariStay! Karibu tena wakati wowote. 🦁`
-          : `SafariStay Booking Confirmed!\n\n` +
-            `Property: ${serviceName}\n` +
-            `Check-in: ${checkIn}\nCheck-out: ${checkOut}\n` +
-            `Guests: ${guests}\nTotal: TSh ${totalAmount}\n\n` +
-            `Thank you for booking with SafariStay! We look forward to welcoming you back. Karibu sana! 🦁`;
-        
         emailSubject = `Booking Confirmed: ${serviceName}`;
-        emailHtml = `
-          <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <div style="background: linear-gradient(135deg, #C69B6D 0%, #5C4033 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
-              <h1 style="color: white; margin: 0; font-size: 28px;">🦁 SafariStay</h1>
-              <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">Booking Confirmation</p>
-            </div>
-            <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 12px 12px;">
-              <h2 style="color: #5C4033; margin-top: 0;">Your Stay is Confirmed!</h2>
-              <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                <h3 style="margin: 0 0 15px 0; color: #333;">${serviceName}</h3>
-                <p style="margin: 5px 0;"><strong>📅 Check-in:</strong> ${checkIn}</p>
-                <p style="margin: 5px 0;"><strong>📅 Check-out:</strong> ${checkOut}</p>
-                <p style="margin: 5px 0;"><strong>👥 Guests:</strong> ${guests}</p>
-                <hr style="border: none; border-top: 1px solid #eee; margin: 15px 0;">
-                <p style="margin: 5px 0; font-size: 20px;"><strong>Total: $${totalAmount}</strong></p>
-              </div>
-              <p style="color: #666; font-size: 14px;">Thank you for choosing SafariStay. We hope you have an amazing experience!</p>
-            </div>
-          </div>
-        `;
-        break;
-        
-      case 'ride':
-        smsMessage = lang === 'sw'
-          ? `SafariStay - Safari Imethibitishwa!\n\n` +
-            `Gari: ${serviceName}\n` +
-            `Tarehe: ${startDate} - ${endDate}\n` +
-            (pickupLocation ? `Mahali pa kupanda: ${pickupLocation}\n` : '') +
-            `Jumla: TSh ${totalAmount}\n\n` +
-            `Asante! Safari njema na karibu tena! 🚗`
-          : `SafariStay Ride Booked!\n\n` +
-            `Vehicle: ${serviceName}\n` +
-            `Dates: ${startDate} - ${endDate}\n` +
-            (pickupLocation ? `Pickup: ${pickupLocation}\n` : '') +
-            `Total: TSh ${totalAmount}\n\n` +
-            `Thank you! Safe travels and welcome back anytime! 🚗`;
-        
-        emailSubject = `Ride Booking Confirmed: ${serviceName}`;
-        emailHtml = `
-          <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <div style="background: linear-gradient(135deg, #C69B6D 0%, #5C4033 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
-              <h1 style="color: white; margin: 0; font-size: 28px;">🚗 SafariStay</h1>
-              <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">Ride Confirmation</p>
-            </div>
-            <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 12px 12px;">
-              <h2 style="color: #5C4033; margin-top: 0;">Your Ride is Confirmed!</h2>
-              <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                <h3 style="margin: 0 0 15px 0; color: #333;">${serviceName}</h3>
-                <p style="margin: 5px 0;"><strong>📅 From:</strong> ${startDate}</p>
-                <p style="margin: 5px 0;"><strong>📅 To:</strong> ${endDate}</p>
-                ${pickupLocation ? `<p style="margin: 5px 0;"><strong>📍 Pickup:</strong> ${pickupLocation}</p>` : ''}
-                ${dropoffLocation ? `<p style="margin: 5px 0;"><strong>📍 Dropoff:</strong> ${dropoffLocation}</p>` : ''}
-                <hr style="border: none; border-top: 1px solid #eee; margin: 15px 0;">
-                <p style="margin: 5px 0; font-size: 20px;"><strong>Total: $${totalAmount}</strong></p>
-              </div>
-              <p style="color: #666; font-size: 14px;">Safe travels with SafariStay!</p>
-            </div>
-          </div>
-        `;
-        break;
-        
-      case 'event_hall':
-        smsMessage = lang === 'sw'
-          ? `SafariStay - Ukumbi Umehifadhiwa!\n\n` +
-            `Ukumbi: ${serviceName}\n` +
-            `Tarehe: ${eventDate}\n` +
-            (eventType ? `Tukio: ${eventType}\n` : '') +
-            `Wageni: ${expectedGuests}\nJumla: TSh ${totalAmount}\n\n` +
-            `Asante sana! Tunakutakia tukio zuri. Karibu tena! 🎉`
-          : `SafariStay Venue Booked!\n\n` +
-            `Venue: ${serviceName}\n` +
-            `Date: ${eventDate}\n` +
-            (eventType ? `Event: ${eventType}\n` : '') +
-            `Guests: ${expectedGuests}\nTotal: TSh ${totalAmount}\n\n` +
-            `Thank you for choosing SafariStay! We wish you a wonderful event. Welcome back anytime! 🎉`;
-        
-        emailSubject = `Venue Booking Confirmed: ${serviceName}`;
         emailHtml = `
           <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="background: linear-gradient(135deg, #C69B6D 0%, #5C4033 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">

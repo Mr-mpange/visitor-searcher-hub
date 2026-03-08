@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { LanguageSelector, type LanguageCode } from "@/components/booking/LanguageSelector";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -165,6 +166,7 @@ const EventDetailPage = () => {
   const [eventType, setEventType] = useState("");
   const [phone, setPhone] = useState("");
   const [notes, setNotes] = useState("");
+  const [language, setLanguage] = useState<LanguageCode>("en");
   const [isBooking, setIsBooking] = useState(false);
   const [bookingType, setBookingType] = useState<"hourly" | "daily">("hourly");
 
@@ -268,6 +270,7 @@ const EventDetailPage = () => {
           expectedGuests,
           hours: bookingType === "hourly" ? hours : 'Full Day',
           totalAmount,
+          language,
         }
       }).catch(err => console.log('SMS notification skipped:', err));
 
@@ -313,6 +316,7 @@ const EventDetailPage = () => {
             totalAmount,
             eventDate: eventDateStr,
             expectedGuests,
+            language,
           }
         }).catch(err => console.log('Voice call skipped:', err));
       }
@@ -593,6 +597,9 @@ const EventDetailPage = () => {
                       className="mt-1"
                     />
                   </div>
+
+                  {/* Language Preference */}
+                  <LanguageSelector value={language} onChange={setLanguage} />
 
                   <div>
                     <Label htmlFor="notes">Special Requests (Optional)</Label>
