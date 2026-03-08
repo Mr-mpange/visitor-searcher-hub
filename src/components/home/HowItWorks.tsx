@@ -495,13 +495,13 @@ export const HowItWorks = () => {
         {/* Section Header */}
         <div className="text-center mb-10 lg:mb-16">
           <span className="inline-block text-xs font-semibold uppercase tracking-widest text-primary mb-3 px-3 py-1 rounded-full bg-primary/10">
-            Simple Process
+            {t("how_it_works_badge")}
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-foreground mb-4">
-            How It Works
+            {t("how_it_works_title")}
           </h2>
           <p className="text-base lg:text-lg text-muted-foreground max-w-2xl mx-auto">
-            From discovery to doorstep — book your perfect African experience in five easy steps.
+            {t("how_it_works_subtitle")}
           </p>
         </div>
 
