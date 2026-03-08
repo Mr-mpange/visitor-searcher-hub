@@ -158,7 +158,7 @@ export const FeaturedListings = () => {
                 {/* Featured Badge */}
                 {listing.featured && (
                   <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-accent text-accent-foreground text-xs font-semibold">
-                    Featured
+                    {t("featured")}
                   </div>
                 )}
               </div>
