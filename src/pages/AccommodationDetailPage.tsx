@@ -309,6 +309,7 @@ const AccommodationDetailPage = () => {
           checkOut: checkOutStr,
           guests,
           totalAmount,
+          language,
         }
       }).catch(err => console.log('SMS notification skipped:', err));
 
