@@ -585,7 +585,7 @@ const AccommodationDetailPage = () => {
 
             {/* Booking Card */}
             <div className="lg:col-span-1">
-              <Card className="sticky top-24">
+              <Card className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto">
                 <CardHeader>
                   <div className="flex items-baseline gap-2">
                     <span className="text-2xl font-bold text-foreground">
