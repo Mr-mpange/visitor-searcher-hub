@@ -79,7 +79,6 @@ export const FeaturedListings = () => {
   const [activeFilter, setActiveFilter] = useState("filter_all");
   const [favorites, setFavorites] = useState<number[]>([]);
   const { t } = useLanguage();
-  const [favorites, setFavorites] = useState<number[]>([]);
 
   const toggleFavorite = (id: number) => {
     setFavorites((prev) =>
