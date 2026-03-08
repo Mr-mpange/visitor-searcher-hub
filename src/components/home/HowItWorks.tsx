@@ -404,6 +404,7 @@ export const HowItWorks = () => {
   const pauseTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const ActiveScreen = phoneScreens[activeStep];
+  const { t } = useLanguage();
 
   const nextStep = useCallback(() => {
     setDirection('next');
