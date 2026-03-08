@@ -1,45 +1,16 @@
 import { useState, useEffect, useCallback, useRef, TouchEvent } from "react";
 import { Search, Calendar, CreditCard, PartyPopper, Phone, Globe, Star, MapPin, Users, ChevronRight, Check, Hash, Play, Pause } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const STEP_DURATION = 5000; // ms per step
 
-const steps = [
-  {
-    id: 1,
-    icon: Search,
-    title: "Search & Discover",
-    description: "Browse curated listings of accommodations, rides, and event venues across Africa.",
-    accent: "primary",
-  },
-  {
-    id: 2,
-    icon: Calendar,
-    title: "Select & Customize",
-    description: "Choose your dates, guests, and any special requirements for your perfect stay.",
-    accent: "accent",
-  },
-  {
-    id: 3,
-    icon: CreditCard,
-    title: "Book & Pay",
-    description: "Secure your reservation with mobile money, card, or USSD — whatever suits you.",
-    accent: "success",
-  },
-  {
-    id: 4,
-    icon: PartyPopper,
-    title: "Enjoy Your Stay",
-    description: "Receive instant confirmation via SMS & voice call, then enjoy world-class hospitality.",
-    accent: "warning",
-  },
-  {
-    id: 5,
-    icon: Phone,
-    title: "USSD Booking",
-    description: "No internet? Dial *384*123# from any phone to book — works on every network.",
-    accent: "destructive",
-  },
+const stepKeys = [
+  { id: 1, icon: Search, titleKey: "step_search", descKey: "step_search_desc", accent: "primary" },
+  { id: 2, icon: Calendar, titleKey: "step_select", descKey: "step_select_desc", accent: "accent" },
+  { id: 3, icon: CreditCard, titleKey: "step_book", descKey: "step_book_desc", accent: "success" },
+  { id: 4, icon: PartyPopper, titleKey: "step_enjoy", descKey: "step_enjoy_desc", accent: "warning" },
+  { id: 5, icon: Phone, titleKey: "step_ussd", descKey: "step_ussd_desc", accent: "destructive" },
 ];
 
 /* ─── Simulated Phone Screens ─── */
@@ -433,17 +404,18 @@ export const HowItWorks = () => {
   const pauseTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const ActiveScreen = phoneScreens[activeStep];
+  const { t } = useLanguage();
 
   const nextStep = useCallback(() => {
     setDirection('next');
-    setActiveStep((prev) => (prev + 1) % steps.length);
+    setActiveStep((prev) => (prev + 1) % stepKeys.length);
     setProgressKey((k) => k + 1);
     setAnimKey((k) => k + 1);
   }, []);
 
   const prevStep = useCallback(() => {
     setDirection('prev');
-    setActiveStep((prev) => (prev - 1 + steps.length) % steps.length);
+    setActiveStep((prev) => (prev - 1 + stepKeys.length) % stepKeys.length);
     setProgressKey((k) => k + 1);
     setAnimKey((k) => k + 1);
   }, []);
@@ -523,13 +495,13 @@ export const HowItWorks = () => {
         {/* Section Header */}
         <div className="text-center mb-10 lg:mb-16">
           <span className="inline-block text-xs font-semibold uppercase tracking-widest text-primary mb-3 px-3 py-1 rounded-full bg-primary/10">
-            Simple Process
+            {t("how_it_works_badge")}
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-foreground mb-4">
-            How It Works
+            {t("how_it_works_title")}
           </h2>
           <p className="text-base lg:text-lg text-muted-foreground max-w-2xl mx-auto">
-            From discovery to doorstep — book your perfect African experience in five easy steps.
+            {t("how_it_works_subtitle")}
           </p>
         </div>
 
@@ -576,7 +548,7 @@ export const HowItWorks = () => {
 
           {/* Steps List */}
           <div className="order-2 space-y-2">
-            {steps.map((step, index) => {
+            {stepKeys.map((step, index) => {
               const isActive = activeStep === index;
               return (
                 <button
@@ -609,13 +581,13 @@ export const HowItWorks = () => {
                         "text-base lg:text-lg font-semibold mb-0.5 transition-colors",
                         isActive ? "text-foreground" : "text-muted-foreground"
                       )}>
-                        {step.title}
+                        {t(step.titleKey)}
                       </h3>
                       <p className={cn(
                         "text-sm leading-relaxed transition-all duration-300",
                         isActive ? "text-muted-foreground max-h-20 opacity-100" : "max-h-0 opacity-0 overflow-hidden"
                       )}>
-                        {step.description}
+                        {t(step.descKey)}
                       </p>
                       {isActive && (
                         <StepProgressBar

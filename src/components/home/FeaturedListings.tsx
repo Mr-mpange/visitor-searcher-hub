@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Star, MapPin, Heart, ArrowRight, Bed, Users, Wifi } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 import safariTentImg from "@/assets/accommodation-safari-tent.jpg";
 import beachResortImg from "@/assets/accommodation-beach-resort.jpg";
 import cityApartmentImg from "@/assets/accommodation-city-apartment.jpg";
@@ -72,11 +73,12 @@ const featuredListings = [
   },
 ];
 
-const filters = ["All", "Lodges", "Hotels", "Villas", "Camps"];
+const filterKeys = ["filter_all", "filter_lodges", "filter_hotels", "filter_villas", "filter_camps"];
 
 export const FeaturedListings = () => {
-  const [activeFilter, setActiveFilter] = useState("All");
+  const [activeFilter, setActiveFilter] = useState("filter_all");
   const [favorites, setFavorites] = useState<number[]>([]);
+  const { t } = useLanguage();
 
   const toggleFavorite = (id: number) => {
     setFavorites((prev) =>
@@ -91,27 +93,27 @@ export const FeaturedListings = () => {
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10">
           <div>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-foreground mb-4">
-              Featured Stays
+              {t("featured_stays")}
             </h2>
             <p className="text-lg text-muted-foreground max-w-xl">
-              Handpicked accommodations offering exceptional experiences and value.
+              {t("featured_stays_desc")}
             </p>
           </div>
 
           {/* Filters */}
           <div className="flex gap-2 flex-wrap">
-            {filters.map((filter) => (
+            {filterKeys.map((filterKey) => (
               <button
-                key={filter}
-                onClick={() => setActiveFilter(filter)}
+                key={filterKey}
+                onClick={() => setActiveFilter(filterKey)}
                 className={cn(
                   "px-4 py-2 rounded-full text-sm font-medium transition-all",
-                  activeFilter === filter
+                  activeFilter === filterKey
                     ? "bg-primary text-primary-foreground shadow-md"
                     : "bg-card text-muted-foreground hover:bg-secondary"
                 )}
               >
-                {filter}
+                {t(filterKey)}
               </button>
             ))}
           </div>
@@ -155,7 +157,7 @@ export const FeaturedListings = () => {
                 {/* Featured Badge */}
                 {listing.featured && (
                   <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-accent text-accent-foreground text-xs font-semibold">
-                    Featured
+                    {t("featured")}
                   </div>
                 )}
               </div>
@@ -195,7 +197,7 @@ export const FeaturedListings = () => {
                   </div>
                   <div>
                     <span className="text-lg font-bold text-foreground">${listing.price}</span>
-                    <span className="text-muted-foreground text-sm">/night</span>
+                    <span className="text-muted-foreground text-sm">{t("per_night")}</span>
                   </div>
                 </div>
               </div>
@@ -207,7 +209,7 @@ export const FeaturedListings = () => {
         <div className="text-center mt-10">
           <Button variant="outline" size="lg" asChild>
             <Link to="/accommodation">
-              View All Stays <ArrowRight className="w-5 h-5" />
+              {t("view_all_stays")} <ArrowRight className="w-5 h-5" />
             </Link>
           </Button>
         </div>
