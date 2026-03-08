@@ -548,7 +548,7 @@ export const HowItWorks = () => {
 
           {/* Steps List */}
           <div className="order-2 space-y-2">
-            {steps.map((step, index) => {
+            {stepKeys.map((step, index) => {
               const isActive = activeStep === index;
               return (
                 <button
@@ -581,13 +581,13 @@ export const HowItWorks = () => {
                         "text-base lg:text-lg font-semibold mb-0.5 transition-colors",
                         isActive ? "text-foreground" : "text-muted-foreground"
                       )}>
-                        {step.title}
+                        {t(step.titleKey)}
                       </h3>
                       <p className={cn(
                         "text-sm leading-relaxed transition-all duration-300",
                         isActive ? "text-muted-foreground max-h-20 opacity-100" : "max-h-0 opacity-0 overflow-hidden"
                       )}>
-                        {step.description}
+                        {t(step.descKey)}
                       </p>
                       {isActive && (
                         <StepProgressBar
