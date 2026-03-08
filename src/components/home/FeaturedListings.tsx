@@ -94,10 +94,10 @@ export const FeaturedListings = () => {
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10">
           <div>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-foreground mb-4">
-              Featured Stays
+              {t("featured_stays")}
             </h2>
             <p className="text-lg text-muted-foreground max-w-xl">
-              Handpicked accommodations offering exceptional experiences and value.
+              {t("featured_stays_desc")}
             </p>
           </div>
 
