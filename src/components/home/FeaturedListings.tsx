@@ -210,7 +210,7 @@ export const FeaturedListings = () => {
         <div className="text-center mt-10">
           <Button variant="outline" size="lg" asChild>
             <Link to="/accommodation">
-              View All Stays <ArrowRight className="w-5 h-5" />
+              {t("view_all_stays")} <ArrowRight className="w-5 h-5" />
             </Link>
           </Button>
         </div>
