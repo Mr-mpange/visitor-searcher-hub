@@ -1,22 +1,33 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, MapPin, User, Heart, CalendarCheck } from "lucide-react";
+import { Menu, X, MapPin, User, Heart, CalendarCheck, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
-
-const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/accommodation", label: "Accommodation" },
-  { href: "/rides", label: "Rides" },
-  { href: "/events", label: "Event Halls" },
-  { href: "/how-it-works", label: "How It Works" },
-];
+import { useLanguage } from "@/contexts/LanguageContext";
+import { SUPPORTED_LANGUAGES, type LanguageCode } from "@/components/booking/LanguageSelector";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { user } = useAuth();
+  const { language, setLanguage, t } = useLanguage();
+
+  const currentLang = SUPPORTED_LANGUAGES.find(l => l.code === language);
+
+  const navLinks = [
+    { href: "/", label: t("home") },
+    { href: "/accommodation", label: t("accommodation") },
+    { href: "/rides", label: t("rides") },
+    { href: "/events", label: t("event_halls") },
+    { href: "/how-it-works", label: t("how_it_works") },
+  ];
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 glass border-b border-border/50">
@@ -54,9 +65,34 @@ export const Navbar = () => {
           </nav>
 
           {/* Desktop Actions */}
-          <div className="hidden lg:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-3">
+            {/* Language Switcher */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground hover:text-foreground">
+                  <Globe className="w-4 h-4" />
+                  <span className="text-xs">{currentLang?.flag}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-[160px]">
+                {SUPPORTED_LANGUAGES.map((lang) => (
+                  <DropdownMenuItem
+                    key={lang.code}
+                    onClick={() => setLanguage(lang.code as LanguageCode)}
+                    className={cn(
+                      "flex items-center gap-2 cursor-pointer",
+                      language === lang.code && "bg-primary/10 text-primary font-medium"
+                    )}
+                  >
+                    <span>{lang.flag}</span>
+                    <span>{lang.label}</span>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <Button variant="ghost" size="sm" asChild>
-              <Link to="/owner/login">For Providers</Link>
+              <Link to="/owner/login">{t("for_providers")}</Link>
             </Button>
             {user ? (
               <>
@@ -73,7 +109,7 @@ export const Navbar = () => {
                 <Button variant="outline" size="sm" asChild>
                   <Link to="/profile">
                     <User className="w-4 h-4" />
-                    My Profile
+                    {t("my_profile")}
                   </Link>
                 </Button>
               </>
@@ -82,24 +118,50 @@ export const Navbar = () => {
                 <Button variant="outline" size="sm" asChild>
                   <Link to="/login">
                     <User className="w-4 h-4" />
-                    Login
+                    {t("login")}
                   </Link>
                 </Button>
                 <Button size="sm" asChild>
-                  <Link to="/signup">Sign Up</Link>
+                  <Link to="/signup">{t("sign_up")}</Link>
                 </Button>
               </>
             )}
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            className="lg:hidden p-2 rounded-lg hover:bg-muted transition-colors"
-            onClick={() => setIsOpen(!isOpen)}
-            aria-label="Toggle menu"
-          >
-            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          <div className="flex lg:hidden items-center gap-2">
+            {/* Mobile Language Switcher */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="p-2 rounded-lg hover:bg-muted transition-colors">
+                  <span className="text-sm">{currentLang?.flag}</span>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-[160px]">
+                {SUPPORTED_LANGUAGES.map((lang) => (
+                  <DropdownMenuItem
+                    key={lang.code}
+                    onClick={() => setLanguage(lang.code as LanguageCode)}
+                    className={cn(
+                      "flex items-center gap-2 cursor-pointer",
+                      language === lang.code && "bg-primary/10 text-primary font-medium"
+                    )}
+                  >
+                    <span>{lang.flag}</span>
+                    <span>{lang.label}</span>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <button
+              className="p-2 rounded-lg hover:bg-muted transition-colors"
+              onClick={() => setIsOpen(!isOpen)}
+              aria-label="Toggle menu"
+            >
+              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Navigation */}
@@ -127,20 +189,20 @@ export const Navbar = () => {
                 onClick={() => setIsOpen(false)}
                 className="px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
               >
-                For Providers
+                {t("for_providers")}
               </Link>
               <div className="flex gap-2 px-4 pt-2">
                 {user ? (
                   <Button variant="outline" size="sm" className="flex-1" asChild>
-                    <Link to="/profile" onClick={() => setIsOpen(false)}>My Profile</Link>
+                    <Link to="/profile" onClick={() => setIsOpen(false)}>{t("my_profile")}</Link>
                   </Button>
                 ) : (
                   <>
                     <Button variant="outline" size="sm" className="flex-1" asChild>
-                      <Link to="/login" onClick={() => setIsOpen(false)}>Login</Link>
+                      <Link to="/login" onClick={() => setIsOpen(false)}>{t("login")}</Link>
                     </Button>
                     <Button size="sm" className="flex-1" asChild>
-                      <Link to="/signup" onClick={() => setIsOpen(false)}>Sign Up</Link>
+                      <Link to="/signup" onClick={() => setIsOpen(false)}>{t("sign_up")}</Link>
                     </Button>
                   </>
                 )}
