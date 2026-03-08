@@ -73,10 +73,12 @@ const featuredListings = [
   },
 ];
 
-const filters = ["All", "Lodges", "Hotels", "Villas", "Camps"];
+const filterKeys = ["filter_all", "filter_lodges", "filter_hotels", "filter_villas", "filter_camps"];
 
 export const FeaturedListings = () => {
-  const [activeFilter, setActiveFilter] = useState("All");
+  const [activeFilter, setActiveFilter] = useState("filter_all");
+  const [favorites, setFavorites] = useState<number[]>([]);
+  const { t } = useLanguage();
   const [favorites, setFavorites] = useState<number[]>([]);
 
   const toggleFavorite = (id: number) => {
