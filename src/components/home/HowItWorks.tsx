@@ -408,7 +408,7 @@ export const HowItWorks = () => {
 
   const nextStep = useCallback(() => {
     setDirection('next');
-    setActiveStep((prev) => (prev + 1) % steps.length);
+    setActiveStep((prev) => (prev + 1) % stepKeys.length);
     setProgressKey((k) => k + 1);
     setAnimKey((k) => k + 1);
   }, []);
