@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Star, MapPin, Heart, ArrowRight, Bed, Users, Wifi } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 import safariTentImg from "@/assets/accommodation-safari-tent.jpg";
 import beachResortImg from "@/assets/accommodation-beach-resort.jpg";
 import cityApartmentImg from "@/assets/accommodation-city-apartment.jpg";
